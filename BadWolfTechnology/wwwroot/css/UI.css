@@ -1,0 +1,200 @@
+body {
+    margin-left: 0;
+    margin-right: 0;
+    margin-top: 0;
+}
+
+.b-topmenu {
+    display: block;
+    position: fixed;
+    z-index: 10;
+    top: 0;
+    left: 50%;
+    width: 1000px;
+    height: 20px;
+    margin: 0;
+    -webkit-transform: translateX(-50%) translateZ(0);
+    transform: translateX(-50%) translateZ(0);
+}
+
+.header {
+    font: 0/0 a;
+    position: relative;
+    margin-bottom: 0px;
+}
+
+.header__left {
+    width: 35%;
+}
+
+*,
+:after,
+:before {
+    box-sizing: inherit;
+}
+
+div {
+    display: block;
+}
+
+.header__image {
+    display: block;
+    max-width: 100%
+}
+
+.header__right {
+    position: absolute;
+    top: 0;
+    right: 0;
+    bottom: 0;
+    left: 35%;
+    width: 65%;
+}
+
+.header__title {
+    position: absolute;
+    top: 5px;
+    right: 10px;
+    bottom: 5px;
+    left: 10px;
+    margin: 0;
+    background: url(/image/header_right.png) 100% 50% no-repeat;
+    background-size: contain
+}
+
+@media only screen and (max-device-width:480px) {
+    .header {
+        padding-bottom: 24%
+    }
+
+    .header__left {
+        display: none
+    }
+
+    .header__right {
+        left: 0;
+        width: 100%
+    }
+}
+
+.container {
+    width: 1000px;
+    margin: 0 auto;
+    background-color: black;
+}
+
+.b-menu,
+.b-menu__item {
+    margin: 0;
+    padding: 0;
+}
+
+.b-topmenu .b-submenu {
+    position: absolute;
+    left: 0;
+    display: none;
+    overflow: hidden;
+    padding: 10px 5px 5px 5px;
+    border-radius: 0 0 3px 3px;
+    background: #eee;
+    box-shadow: inset 0 5px 5px -5px #000, 1px 1px 1px #000;
+}
+
+*,
+:after,
+:before {
+    box-sizing: inherit;
+}
+
+.admin {
+    width: 220px;
+    height: 25px;
+    background: #F34545;
+    border-radius: 7px;
+    -moz-border-radius: 7px;
+    -webkit-border-radius: 7px;
+    font-family: Verdana, Arial, Sans-Serif;
+    font-size: 200px;
+    left: 10px;
+    margin-top: 10px;
+    margin-top: 10px;
+    margin-bottom: 10px;
+    font-size: 13px
+}
+
+.redacktirovanie {
+    width: 33px;
+    height: 33px;
+    margin: 0;
+    padding: 0;
+    border: 0;
+    background: transparent url(‘путь к картинке’) no-repeat center top;
+    text-indent: -1000em;
+    cursor: pointer;
+    cursor: hand;
+}
+
+.delete {
+    width: 33px;
+    height: 33px;
+    margin: 0;
+    padding: 0;
+    border: 0;
+    background: transparent url('badwolf.tech/files/delete.png') no-repeat center top;
+    cursor: pointer;
+    cursor: hand;
+}
+
+.cookie_wrap {
+    display: flex;
+    flex-flow: row nowrap;
+    justify-content: space-between;
+    align-items: center;
+    background: rgba(0, 0, 0, 0.8);
+    padding: 10px 0px;
+    position: fixed;
+    z-index: 100;
+    font-family: Verdana, Arial, Sans-Serif;
+    font-size: 13px;
+    bottom: 0;
+    width: 100%;
+}
+
+.cookie_text {
+    max-width: 1200px;
+    padding: 0px 15px;
+}
+
+.cookie_group_button {
+    display: flex;
+    align-items: center;
+}
+
+.cookie_button {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    width: 180px;
+    height: 40px;
+    text-align: center;
+    background: #ccc;
+    color: #000;
+    border-radius: 5px;
+    margin: 0 10px;
+    margin-left: auto;
+}
+
+.cookie_button:hover {
+    background: #aaa;
+    cursor: pointer;
+}
+
+.cookie_close {
+    font-size: 40px;
+    font-weight: bold;
+    transform: rotate(45deg);
+}
+
+.cookie_close:hover {
+    cursor: pointer;
+}
