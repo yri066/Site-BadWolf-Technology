@@ -1,0 +1,56 @@
+﻿@page
+@model RegisterModel
+@{
+    Layout = "_LayoutWithoutLogin";
+    ViewData["Title"] = "Register";
+}
+
+<div class="form-container">
+    <h2 class="boxTitle">Регистрация</h2>
+    <div class="boxContent">
+        <form class="form" asp-route-returnUrl="@Model.ReturnUrl" method="post">
+            <div asp-validation-summary="ModelOnly" class="text-danger"></div>
+            <div class="form-group">
+                <label asp-for="Input.Email" class="text"></label>
+                <input asp-for="Input.Email" class="text-input" placeholder="@Html.DisplayNameFor(m=>m.Input.Email)" autocomplete="email" aria-required="true" />
+            </div>
+            <span asp-validation-for="Input.Email" class="text-danger"></span>
+            <div class="form-group">
+                <label asp-for="Input.UserName" class="text"></label>
+                <input asp-for="Input.UserName" class="text-input" placeholder="@Html.DisplayNameFor(m=>m.Input.UserName)" autocomplete="username" aria-required="true" />
+            </div>
+            <span asp-validation-for="Input.UserName" class="text-danger"></span>
+            <div class="form-group">
+                <label asp-for="Input.FirstName" class="text"></label>
+                <input asp-for="Input.FirstName" class="text-input" placeholder="@Html.DisplayNameFor(m=>m.Input.FirstName)" autocomplete="given-name" aria-required="true" />
+            </div>
+            <span asp-validation-for="Input.FirstName" class="text-danger"></span>
+            <div class="form-group">
+                <label asp-for="Input.LastName" class="text"></label>
+                <input asp-for="Input.LastName" class="text-input" placeholder="@Html.DisplayNameFor(m=>m.Input.LastName)" autocomplete="family-name" aria-required="true" />
+            </div>
+            <span asp-validation-for="Input.LastName" class="text-danger"></span>
+            <div class="form-group">
+                <label asp-for="Input.BirthDate" class="text"></label>
+                <input asp-for="Input.BirthDate" class="text-input" aria-required="true" />
+            </div>
+            <span asp-validation-for="Input.BirthDate" class="text-danger"></span>
+            <div class="form-group">
+                <label asp-for="Input.Password" class="text"></label>
+                <input asp-for="Input.Password" class="text-input" placeholder="@Html.DisplayNameFor(m=>m.Input.Password)" autocomplete="new-password" aria-required="true" />
+            </div>
+            <span asp-validation-for="Input.Password" class="text-danger"></span>
+            <div class="form-group">
+                <label asp-for="Input.ConfirmPassword" class="text"></label>
+                <input asp-for="Input.ConfirmPassword" class="text-input" placeholder="@Html.DisplayNameFor(m=>m.Input.ConfirmPassword)" autocomplete="new-password" aria-required="true" />
+            </div>
+            <span asp-validation-for="Input.ConfirmPassword" class="text-danger"></span>
+            <button class="btn" type="submit">Зарегистрироваться</button>
+        </form>
+    </div>
+</div>
+<br />
+
+@section Scripts {
+    <partial name="_ValidationScriptsPartial" />
+}

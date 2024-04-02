@@ -43,7 +43,7 @@ body {
     -moz-border-radius: 7px 7px 0px 0px;
     -webkit-border-radius: 7px 7px 0px 0px;
     border-radius: 7px 7px 0px 0px;
-    margin-bottom: 3px;
+    margin-bottom: 0px;
 }
 
 .boxContent {
@@ -209,6 +209,12 @@ body {
     font-size: 13px
 }
 
+.text-danger {
+    color: #f58614;
+    font-family: Verdana, Arial, Sans-Serif;
+    font-size: 13px;
+}
+
 .text img {
     border-radius: 7px;
     -moz-border-radius: 7px;
@@ -259,8 +265,49 @@ hr {
     border-style: none;
 }
 
+/*form*/
 
+.form-container {
+    width: 100%;
+    max-width: 600px;
+    margin: 0 auto;
+}
 
+.form {
+    text-align: center;
+}
+
+.form-group {
+    display: flex;
+    align-items: center;
+}
+
+.form .text-danger {
+    display: flex;
+    align-items: center;
+    margin: 10px;
+    justify-content: center;
+}
+
+.form-group label {
+    flex: 1;
+    text-align: right;
+    margin-right: 10px;
+}
+
+.form-group input {
+    flex: 2;
+}
+
+.text-danger.validation-summary-errors {
+    background-color: maroon;
+    margin: 0px;
+    margin-bottom: 10px;
+    border: 10px;
+    border-radius: 3px;
+    color: #ccc;
+    text-align: left;
+}
 /*files text*/
 .LightBlock {
     padding: 5px;
