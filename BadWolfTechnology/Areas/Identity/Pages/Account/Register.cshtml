@@ -45,6 +45,7 @@
                 <input asp-for="Input.ConfirmPassword" class="text-input" placeholder="@Html.DisplayNameFor(m=>m.Input.ConfirmPassword)" autocomplete="new-password" aria-required="true" />
             </div>
             <span asp-validation-for="Input.ConfirmPassword" class="text-danger"></span>
+            @Html.ReCaptcha()
             <button class="btn" type="submit">Зарегистрироваться</button>
         </form>
     </div>

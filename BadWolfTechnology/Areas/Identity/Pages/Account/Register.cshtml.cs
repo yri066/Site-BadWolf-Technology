@@ -12,9 +12,11 @@ using Microsoft.AspNetCore.Identity.UI.Services;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
 using Microsoft.AspNetCore.WebUtilities;
+using AspNetCore.ReCaptcha;
 
 namespace BadWolfTechnology.Areas.Identity.Pages.Account
 {
+    [ValidateReCaptcha]
     public class RegisterModel : PageModel
     {
         private readonly SignInManager<ApplicationUser> _signInManager;

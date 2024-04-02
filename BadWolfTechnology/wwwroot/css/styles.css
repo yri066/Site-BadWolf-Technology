@@ -308,6 +308,14 @@ hr {
     color: #ccc;
     text-align: left;
 }
+
+.g-recaptcha {
+    display: flex;
+    margin: 10px;
+    justify-content: center;
+}
+
+
 /*files text*/
 .LightBlock {
     padding: 5px;
