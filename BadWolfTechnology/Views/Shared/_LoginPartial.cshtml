@@ -2,25 +2,72 @@
 @inject SignInManager<ApplicationUser> SignInManager
 @inject UserManager<ApplicationUser> UserManager
 
-<ul class="navbar-nav">
-@if (SignInManager.IsSignedIn(User))
-{
-    <li class="nav-item">
-        <a  class="nav-link text-dark" asp-area="Identity" asp-page="/Account/Manage/Index" title="Manage">Hello @User.Identity?.Name!</a>
-    </li>
-    <li class="nav-item">
-        <form  class="form-inline" asp-area="Identity" asp-page="/Account/Logout" asp-route-returnUrl="@Url.Action("Index", "Home", new { area = "" })">
-            <button  type="submit" class="nav-link btn btn-link text-dark">Logout</button>
-        </form>
-    </li>
-}
-else
-{
-    <li class="nav-item">
-        <a class="nav-link text-dark" asp-area="Identity" asp-page="/Account/Register">Register</a>
-    </li>
-    <li class="nav-item">
-        <a class="nav-link text-dark" asp-area="Identity" asp-page="/Account/Login">Login</a>
-    </li>
-}
-</ul>
+<table class="boxTable" border="0" cellpadding="0" cellspacing="0">
+    <tbody>
+        @if (SignInManager.IsSignedIn(User))
+        {
+            var user = await UserManager.GetUserAsync(User);
+
+            <tr><td class="boxTitle">Профиль</td></tr>
+            <tr>
+                <td class="boxContent">
+                    <center>
+                        <img src="~/image/default_avatar.png" width="75" height="75" align="center"><br /><br />
+                        <div class="text3" align="center" style="padding:1px;">@user.FirstName @user.LastName</div><br />
+                        <div class="text3" align="left" style="padding:1px;">Почта: @user.Email</div><br />
+                        <div class="text3" align="left" style="padding:1px;">Дата рождения: @user.BirthDate.ToString("dd-MM-yyyy")</div><br />
+                        <div class="text3" align="center" style="padding:1px;"><a class="nav-link text-dark" asp-area="Identity" asp-page="/Account/Manage/Index" title="Настройки учетной записи">Настройки учетной записи</a></div><br />
+                        <form class="form-inline" asp-area="Identity" asp-page="/Account/Logout" asp-route-returnUrl="@Url.Action("Index", "Home", new { area = "" })">
+                            <button type="submit" class="nav-link btn btn-link text-dark">Выход</button>
+                        </form>
+                    </center>
+                </td>
+            </tr>
+        }
+        else
+        {
+            <tr><td class="boxTitle">Авторизуйтесь</td></tr>
+            <tr>
+                <td class="boxContent">
+                    <center>
+                        <form id="account-login" onsubmit="loginAuth();return false;">
+                            <div class="reserlog">
+                                <div style="height:21px;">
+                                    <div class="auth-error" id="auth-error"></div>
+                                </div>
+                                <div style="height:10px;"></div>
+                                <div title="Почта или логин">
+                                    <input class="text-input" type="text" id="EmailOrUserName" name="EmailOrUserName" autocomplete="username" placeholder="Логин" required />
+                                </div>
+                                <div style="height:10px;"></div>
+                                <div title="Пароль" class="fpass">
+                                    <input class="text-input" type="password" name="Password" id="password" autocomplete="password" placeholder="Пароль" required />
+                                </div>
+                                <div style="height:10px;"></div>
+                                <div title="Запомнить?" class="fpass">
+                                    <label class="text">
+                                        <input type="checkbox" class="form-check-input" id="RememberMe" name="RememberMe" />Запомнить?
+                                    </label>
+                                </div>
+                                @Html.AntiForgeryToken()
+                            </div>
+                            <div style="height:10px;"></div>
+                            <li style="list-style:none;">
+                                <span>
+                                    <button class="btn" id="authorization" value="Вход">Вход</button>
+                                </span>
+                            </li>
+                        </form>
+                        <div class="text" align="center">
+                            <p><a class="nav-link text-dark" asp-area="Identity" asp-page="/Account/Register">Регистрация</a></p>
+                        </div>
+                        <div class="text" align="center">
+                            <p><a id="forgot-password" asp-area="Identity" asp-page="/Account/ForgotPassword">Забыл пароль?</a></p>
+                        </div>
+                    </center>
+                </td>
+            </tr>
+            <script src="~/js/Login.js" asp-append-version="true"></script>
+        }
+    </tbody>
+</table>
