@@ -20,7 +20,7 @@ namespace BadWolfTechnology
             builder.Services.AddDatabaseDeveloperPageExceptionFilter();
 
             builder.Services.AddDefaultIdentity<ApplicationUser>(options => options.SignIn.RequireConfirmedAccount = true)
-                .AddEntityFrameworkStores<ApplicationDbContext>();
+                .AddEntityFrameworkStores<ApplicationDbContext>().AddErrorDescriber<RussianIdentityErrorDescriber>();
             builder.Services.AddControllersWithViews();
 
             builder.Services.AddReCaptcha(builder.Configuration.GetSection("ReCaptcha"));
