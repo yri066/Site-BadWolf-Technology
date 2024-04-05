@@ -41,7 +41,8 @@ namespace BadWolfTechnology.Areas.Identity.Pages.Account
         }
 
         [HttpPost("/Account/Login")]
-        public async Task<IActionResult> Index(string returnPathName = null)
+        [ValidateAntiForgeryToken]
+        public async Task<IActionResult> SingIn(string returnPathName = null)
         {
             returnPathName ??= Url.Content("~/");
 
