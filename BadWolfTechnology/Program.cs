@@ -1,6 +1,9 @@
 using AspNetCore.ReCaptcha;
 using BadWolfTechnology.Areas.Identity.Data;
 using BadWolfTechnology.Data;
+using BadWolfTechnology.Data.Interfaces;
+using BadWolfTechnology.Services;
+using Microsoft.AspNetCore.Identity.UI.Services;
 using Microsoft.EntityFrameworkCore;
 
 namespace BadWolfTechnology
@@ -12,6 +15,7 @@ namespace BadWolfTechnology
             var builder = WebApplication.CreateBuilder(args);
             builder.Configuration.AddJsonFile("settings.json");
             builder.Configuration.Bind(OrganizationInfo.Position, new OrganizationInfo());
+            var emailConfig = builder.Configuration.GetSection(EmailConfiguration.Position).Get<EmailConfiguration>();
 
             // Add services to the container.
             var connectionString = builder.Configuration.GetConnectionString("DefaultConnection") ?? throw new InvalidOperationException("Connection string 'DefaultConnection' not found.");
@@ -19,11 +23,13 @@ namespace BadWolfTechnology
                 options.UseSqlServer(connectionString));
             builder.Services.AddDatabaseDeveloperPageExceptionFilter();
 
-            builder.Services.AddDefaultIdentity<ApplicationUser>(options => options.SignIn.RequireConfirmedAccount = true)
+            builder.Services.AddDefaultIdentity<ApplicationUser>(options => options.SignIn.RequireConfirmedAccount = false)
                 .AddEntityFrameworkStores<ApplicationDbContext>().AddErrorDescriber<RussianIdentityErrorDescriber>();
             builder.Services.AddControllersWithViews();
 
             builder.Services.AddReCaptcha(builder.Configuration.GetSection("ReCaptcha"));
+            builder.Services.AddSingleton<IEmailConfiguration>(emailConfig);
+            builder.Services.AddTransient<IEmailSender, EmailSender>();
 
             var app = builder.Build();
 

@@ -48,12 +48,6 @@ namespace BadWolfTechnology.Areas.Identity.Pages.Account
         ///     This API supports the ASP.NET Core Identity default UI infrastructure and is not intended to be used
         ///     directly from your code. This API may change or be removed in future releases.
         /// </summary>
-        public string ReturnUrl { get; set; }
-
-        /// <summary>
-        ///     This API supports the ASP.NET Core Identity default UI infrastructure and is not intended to be used
-        ///     directly from your code. This API may change or be removed in future releases.
-        /// </summary>
         public IList<AuthenticationScheme> ExternalLogins { get; set; }
 
         /// <summary>
@@ -68,12 +62,12 @@ namespace BadWolfTechnology.Areas.Identity.Pages.Account
             /// </summary>
             [Required(ErrorMessage = "Поле '{0}' является обязательным.")]
             [StringLength(100)]
-            [EmailAddress]
+            [EmailAddress(ErrorMessage = "В поле '{0}' не указан действительный адрес электронной почты.")]
             [Display(Name = "Email")]
             public string Email { get; set; }
 
             [Required(ErrorMessage = "Поле '{0}' является обязательным.")]
-            [StringLength(15, ErrorMessage = "Длина {0} должна быть не менее {2} и не более {1} символов.", MinimumLength = 2)]
+            [StringLength(15, ErrorMessage = "Длина Логина должна быть не менее {2} и не более {1} символов.", MinimumLength = 2)]
             [Display(Name = "Логин")]
             public string UserName { get; set; }
 
@@ -115,13 +109,12 @@ namespace BadWolfTechnology.Areas.Identity.Pages.Account
         }
 
 
-        public async Task OnGetAsync(string returnUrl = null)
+        public async Task OnGetAsync()
         {
-            ReturnUrl = returnUrl;
             ExternalLogins = (await _signInManager.GetExternalAuthenticationSchemesAsync()).ToList();
         }
 
-        public async Task<IActionResult> OnPostAsync(string returnUrl = null)
+        public async Task<IActionResult> OnPostAsync(string returnUrl)
         {
             returnUrl ??= Url.Content("~/");
             ExternalLogins = (await _signInManager.GetExternalAuthenticationSchemesAsync()).ToList();
@@ -156,8 +149,9 @@ namespace BadWolfTechnology.Areas.Identity.Pages.Account
                         values: new { area = "Identity", userId = userId, code = code, returnUrl = returnUrl },
                         protocol: Request.Scheme);
 
-                    await _emailSender.SendEmailAsync(Input.Email, "Confirm your email",
-                        $"Please confirm your account by <a href='{HtmlEncoder.Default.Encode(callbackUrl)}'>clicking here</a>.");
+                    await _emailSender.SendEmailAsync(Input.Email, "Подтвердите свой e-mail",
+                        $@"Для подтверждения электронной почты и завершения процесса регистрации <a href='{HtmlEncoder.Default.Encode(callbackUrl)}'>нажмите здесь</a>.<br><br>
+                        Если вы получили это письмо по ошибке, просто игнорируйте его.");
 
                     if (_userManager.Options.SignIn.RequireConfirmedAccount)
                     {
@@ -165,8 +159,8 @@ namespace BadWolfTechnology.Areas.Identity.Pages.Account
                     }
                     else
                     {
-                        await _signInManager.SignInAsync(user, isPersistent: false);
-                        return LocalRedirect(returnUrl);
+                        //await _signInManager.SignInAsync(user, isPersistent: false);
+                        return RedirectToPage("SuccessRegistration", new { email = Input.Email });
                     }
                 }
                 foreach (var error in result.Errors)

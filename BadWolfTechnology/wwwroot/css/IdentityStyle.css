@@ -30,6 +30,9 @@
     -webkit-border-radius: 0px 0px 7px 7px;
     border-radius: 0px 0px 7px 7px;
 }
+.column .alert-dismissible .btn-close {
+    display:none;
+}
 
 .column > p {
     background: #1a1a1a;
