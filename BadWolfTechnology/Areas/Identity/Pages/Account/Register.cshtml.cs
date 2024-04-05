@@ -1,8 +1,4 @@
-﻿// Licensed to the .NET Foundation under one or more agreements.
-// The .NET Foundation licenses this file to you under the MIT license.
-#nullable disable
-
-using System.ComponentModel.DataAnnotations;
+﻿using System.ComponentModel.DataAnnotations;
 using System.Text;
 using System.Text.Encodings.Web;
 using Microsoft.AspNetCore.Authentication;
@@ -16,7 +12,7 @@ using AspNetCore.ReCaptcha;
 
 namespace BadWolfTechnology.Areas.Identity.Pages.Account
 {
-    [ValidateReCaptcha]
+    [ValidateReCaptcha(ErrorMessage = "Ошибка проверки reCAPTCHA. Попробуйте еще раз.")]
     public class RegisterModel : PageModel
     {
         private readonly SignInManager<ApplicationUser> _signInManager;
@@ -131,6 +127,12 @@ namespace BadWolfTechnology.Areas.Identity.Pages.Account
             ExternalLogins = (await _signInManager.GetExternalAuthenticationSchemesAsync()).ToList();
             if (ModelState.IsValid)
             {
+                if (await _userManager.FindByEmailAsync(Input.Email) is not null)
+                {
+                    ModelState.TryAddModelError(nameof(Input.Email), new RussianIdentityErrorDescriber().DuplicateEmail(Input.Email).Description);
+                    return Page();
+                }
+
                 var user = CreateUser();
                 user.UserName = Input.UserName;
                 user.FirstName = Input.FirstName;

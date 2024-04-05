@@ -31,6 +31,15 @@
     border-radius: 0px 0px 7px 7px;
 }
 
+.column > p {
+    background: #1a1a1a;
+    padding: 15px;
+    -moz-border-radius: 0px 0px 7px 7px;
+    -webkit-border-radius: 0px 0px 7px 7px;
+    border-radius: 0px 0px 7px 7px;
+    margin-top: 0px;
+}
+
 .nav-container {
     display: flex;
     align-items: center;
