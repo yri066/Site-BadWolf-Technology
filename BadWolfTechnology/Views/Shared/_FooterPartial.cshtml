@@ -4,10 +4,10 @@ font-family:Verdana,Arial,Sans-Serif;font-size:13px; color: #ccc; margin-top: 5p
         <tr>
             <td align="left" style="padding:15px;">
                 <font color="#919191">
-                    &copy; 2014-@DateTime.Now.Year <!--Название компании-->, Все права защищены.<br />
+                    &copy; 2014-@DateTime.Now.Year @OrganizationInfo.Name, Все права защищены.<br />
                     Cайт разработал в учебных целях Кузнецов Ю.С.<br />
                     Фронтенд собран в 2014г, бэкенд разработан на ASP.NET Core в 2024г.<br />
-                    По различным вопросам обращаться по адресу: <a href="mailto:<!--Почта поддержки-->"><!--Почта поддержки--></a>
+                    По различным вопросам обращаться по адресу: <a href="mailto:@OrganizationInfo.SupportEmail">@OrganizationInfo.SupportEmail</a>
                 </font>
             </td>
             <td align="right" style="padding:15px;">

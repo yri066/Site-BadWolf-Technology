@@ -1,7 +1,6 @@
 using AspNetCore.ReCaptcha;
 using BadWolfTechnology.Areas.Identity.Data;
 using BadWolfTechnology.Data;
-using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 
 namespace BadWolfTechnology
@@ -12,6 +11,7 @@ namespace BadWolfTechnology
         {
             var builder = WebApplication.CreateBuilder(args);
             builder.Configuration.AddJsonFile("settings.json");
+            builder.Configuration.Bind(OrganizationInfo.Position, new OrganizationInfo());
 
             // Add services to the container.
             var connectionString = builder.Configuration.GetConnectionString("DefaultConnection") ?? throw new InvalidOperationException("Connection string 'DefaultConnection' not found.");
