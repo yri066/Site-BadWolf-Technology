@@ -1,8 +1,10 @@
 ﻿using BadWolfTechnology.Areas.Identity.Data;
+using BadWolfTechnology.Data;
 using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Routing;
+using Microsoft.EntityFrameworkCore;
 using System.ComponentModel.DataAnnotations;
 using System.Security.Policy;
 
@@ -13,12 +15,14 @@ namespace BadWolfTechnology.Areas.Identity.Pages.Account
         private readonly SignInManager<ApplicationUser> _signInManager;
         private readonly UserManager<ApplicationUser> _userManager;
         private readonly ILogger<AccountController> _logger;
+        private readonly ApplicationDbContext _context;
 
-        public AccountController(SignInManager<ApplicationUser> signInManager, UserManager<ApplicationUser> userManager, ILogger<AccountController> logger)
+        public AccountController(SignInManager<ApplicationUser> signInManager, UserManager<ApplicationUser> userManager, ILogger<AccountController> logger, ApplicationDbContext context)
         {
             _signInManager = signInManager;
             _userManager = userManager;
             _logger = logger;
+            _context = context;
         }
 
         [BindProperty]
@@ -82,6 +86,22 @@ namespace BadWolfTechnology.Areas.Identity.Pages.Account
             }
 
             return Json(new { error = "Неверный логин или пароль." });
+        }
+
+        [AcceptVerbs("GET", "POST")]
+        public async Task<IActionResult> CheckUserNameAsync([Bind(Prefix = "Input.UserName")][StringLength(maximumLength:15, MinimumLength = 2)] string UserName)
+        {
+            if(!ModelState.IsValid)
+            {
+                return Json(false);
+            }
+
+            if(!string.IsNullOrEmpty(await _context.Users.Select(user => user.NormalizedUserName).AsNoTracking().FirstOrDefaultAsync(username => username == UserName.ToUpper())))
+            {
+                return Json($"Логин {UserName} уже используется.");
+            }
+
+            return Json(true);
         }
     }
 }

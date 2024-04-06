@@ -69,6 +69,7 @@ namespace BadWolfTechnology.Areas.Identity.Pages.Account
             [Required(ErrorMessage = "Поле '{0}' является обязательным.")]
             [StringLength(15, ErrorMessage = "Длина Логина должна быть не менее {2} и не более {1} символов.", MinimumLength = 2)]
             [Display(Name = "Логин")]
+            [Remote(action: "CheckUserName", controller: "Account")]
             public string UserName { get; set; }
 
             [Required(ErrorMessage = "Поле '{0}' является обязательным.")]
