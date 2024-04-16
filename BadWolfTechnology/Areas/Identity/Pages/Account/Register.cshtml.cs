@@ -9,6 +9,7 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
 using Microsoft.AspNetCore.WebUtilities;
 using AspNetCore.ReCaptcha;
+using BadWolfTechnology.Data.DataAnnotations;
 
 namespace BadWolfTechnology.Areas.Identity.Pages.Account
 {
@@ -85,6 +86,7 @@ namespace BadWolfTechnology.Areas.Identity.Pages.Account
             [Required(ErrorMessage = "Поле '{0}' является обязательным.")]
             [DataType(DataType.Date)]
             [Display(Name = "Дата рождения")]
+            [MinimumAge(13)]
             public DateTime BirthDate { get; set; }
 
             /// <summary>
@@ -115,7 +117,7 @@ namespace BadWolfTechnology.Areas.Identity.Pages.Account
             ExternalLogins = (await _signInManager.GetExternalAuthenticationSchemesAsync()).ToList();
         }
 
-        public async Task<IActionResult> OnPostAsync(string returnUrl)
+        public async Task<IActionResult> OnPostAsync(string? returnUrl)
         {
             returnUrl ??= Url.Content("~/");
             ExternalLogins = (await _signInManager.GetExternalAuthenticationSchemesAsync()).ToList();
@@ -150,9 +152,16 @@ namespace BadWolfTechnology.Areas.Identity.Pages.Account
                         values: new { area = "Identity", userId = userId, code = code, returnUrl = returnUrl },
                         protocol: Request.Scheme);
 
-                    await _emailSender.SendEmailAsync(Input.Email, "Подтвердите свой e-mail",
-                        $@"Для подтверждения электронной почты и завершения процесса регистрации <a href='{HtmlEncoder.Default.Encode(callbackUrl)}'>нажмите здесь</a>.<br><br>
+                    try
+                    {
+                        await _emailSender.SendEmailAsync(Input.Email, "Подтвердите свой e-mail",
+                            $@"Для подтверждения электронной почты и завершения процесса регистрации <a href='{HtmlEncoder.Default.Encode(callbackUrl)}'>нажмите здесь</a>.<br><br>
                         Если вы получили это письмо по ошибке, просто игнорируйте его.");
+                    }
+                    catch
+                    {
+                        return RedirectToPage("SuccessRegistration");
+                    }
 
                     if (_userManager.Options.SignIn.RequireConfirmedAccount)
                     {
@@ -161,7 +170,7 @@ namespace BadWolfTechnology.Areas.Identity.Pages.Account
                     else
                     {
                         //await _signInManager.SignInAsync(user, isPersistent: false);
-                        return RedirectToPage("SuccessRegistration", new { email = Input.Email });
+                        return RedirectToPage("SuccessRegistration");
                     }
                 }
                 foreach (var error in result.Errors)
