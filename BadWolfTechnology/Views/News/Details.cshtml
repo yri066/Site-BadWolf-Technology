@@ -1,0 +1,44 @@
+﻿@model News
+@{
+}
+<link href="~/lib/quill/dist/quill.snow.css" rel="stylesheet" />
+
+<div class="BoxNews">
+    <div class="newstitle">
+        <div class="text3">
+            <a asp-action="Details" asp-route-id="@Model.Id">
+                <h2>@Model.Title</h2>
+            </a>
+        </div>
+    </div>
+    <div class="text" style="padding:10px;">
+        <div style="display:inline;">
+            <div style="text-align:center;">
+                @if (@Model.ImageName != null)
+                {
+                    <a class="newsUrl" href="~/image/News/@Model.ImageName" data-fancybox>
+                        <img class="wrapper exmp" src="~/image/News/@Model.ImageName" />
+                    </a>
+                    <br />
+                }
+                <div class="ql-snow">
+                    <div class="ql-editor">
+                        <div class="text-overflow">
+                            @Html.Raw(Model.Text)
+                            </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="newsbottom">
+        Добавлено: <font color="cccccc">@Model.Created.ToString("dd-MM-yy, H:mm")</font>
+    </div>
+</div>
+<br />
+<script src="~/lib/fancyapps/dist/fancybox.umd.js"></script>
+<link rel="stylesheet" href="~/lib/fancyapps/dist/fancybox.css" />
+<script>
+    Fancybox.bind('[data-fancybox]', {
+    });
+</script>
