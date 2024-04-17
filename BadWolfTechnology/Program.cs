@@ -2,6 +2,7 @@ using AspNetCore.ReCaptcha;
 using BadWolfTechnology.Areas.Identity.Data;
 using BadWolfTechnology.Data;
 using BadWolfTechnology.Data.Interfaces;
+using BadWolfTechnology.Data.Services;
 using BadWolfTechnology.Services;
 using Microsoft.AspNetCore.Identity.UI.Services;
 using Microsoft.EntityFrameworkCore;
@@ -30,6 +31,7 @@ namespace BadWolfTechnology
             builder.Services.AddReCaptcha(builder.Configuration.GetSection("ReCaptcha"));
             builder.Services.AddSingleton<IEmailConfiguration>(emailConfig);
             builder.Services.AddTransient<IEmailSender, EmailSender>();
+            builder.Services.AddSingleton<IDateTime, SystemDateTime>();
 
             var app = builder.Build();
 

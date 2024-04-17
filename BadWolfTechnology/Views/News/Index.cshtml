@@ -1,0 +1,72 @@
+﻿@model PaginatedList<IPublication>
+
+@{
+}
+
+<link href="~/lib/quill/dist/quill.snow.css" rel="stylesheet" />
+<a asp-action="Create" class="addPost"><button class="btn">Добавить новость</button></a>
+<br />
+@if (Model.Count() > 0)
+{
+    foreach (News item in Model)
+    {
+        <div class="BoxNews">
+            <div class="newstitle">
+                <div class="text3">
+                    <a asp-action="Details" asp-route-id="@item.Id">
+                        <h2>@item.Title</h2>
+                    </a>
+                </div>
+            </div>
+            <div class="text" style="padding:10px;">
+                <div style="display:inline;">
+                    <div style="text-align:center;">
+                        @if (item.ImageName != null)
+                        {
+                            <a class="newsUrl" asp-action="Details" asp-route-id="@item.Id">
+                                <img class="wrapper exmp" src="~/image/News/@item.ImageName" />
+                            </a>
+                            <br />
+                        }
+                        <div class="ql-snow">
+                            <div class="ql-editor">
+                                <div class="text-overflow-ellipses">
+                                    @Html.Raw(item.Text)
+                                </div>
+                            </div>
+                        </div>
+                        <div class="url">
+                            <a asp-action="Details" asp-route-id="@item.Id">Перейти на страницу</a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="newsbottom">
+                Добавлено: <font color="cccccc">@item.Created.ToString("dd-MM-yy, H:mm")</font> | Комментариев: <font color="#ffc500">@item.CommentCount</font>
+            </div>
+        </div>
+        <br>
+    }
+    <div class="pagination">
+    @if(Model.HasPreviousPage)
+    {
+            <a asp-action="Index" asp-route-Page="@(Model.PageIndex - 1)"><button class="btn">Предыдущая</button></a>
+        }
+        else
+        {
+            <button disabled>Предыдущая</button>
+        }
+        @if (Model.HasNextPage)
+    {
+        <a asp-action="Index" asp-route-Page="@(Model.PageIndex + 1)"><button class="btn">Следующая</button></a>
+    }
+        else
+        {
+            <button disabled>Следующая</button>
+        }
+    </div>
+}
+else
+{
+    <h1>Новостей пока еще нет.</h1>
+}

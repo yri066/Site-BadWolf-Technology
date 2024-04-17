@@ -13,10 +13,28 @@ body {
     border-radius: 0px 0px 10px 10px;
 }
 
+.pagination {
+    text-align: center;
+}
+
+.pagination button {
+    padding: 5px 14px 6px;
+    -webkit-border-radius: 4px;
+    -moz-border-radius: 4px;
+    border-radius: 4px;
+    -webkit-transition: 0.1s linear all;
+    -moz-transition: 0.1s linear all;
+    -ms-transition: 0.1s linear all;
+    -o-transition: 0.1s linear all;
+    transition: 0.1s linear all;
+    border-image: initial;
+    border: 1px solid #CCC;
+}
 
 .column {
     width: 70%;
     padding: 10px 20px 20px 20px;
+    max-width: 600px;
 }
 
 .column1 {
@@ -172,6 +190,11 @@ body {
     border-radius: 5px;
 }
 
+.BoxComment {
+    background: #1b1b1b;
+    border-radius: 5px;
+}
+
 
 
 .Title {
@@ -200,6 +223,51 @@ body {
     font-size: 16px;
     color: #ccc;
     font-family: Verdana, Arial, Sans-Serif
+}
+
+.ql-editor {
+    white-space: normal !important;
+}
+
+.url {
+    text-align: justify;
+    padding: 12px 15px;
+}
+
+.ql-code-block-container {
+    color: #ccc !important;
+}
+
+.text-overflow-ellipses {
+    word-break: break-word;
+    overflow: hidden;
+    display: -webkit-box;
+    -webkit-line-clamp: 10;
+    -webkit-box-orient: vertical;
+    line-height: 1.3em;
+    max-height: 21 em;
+}
+
+.text-overflow {
+    word-break: break-word;
+    text-align: left;
+    line-height: 1.3em;
+}
+
+.wrapper {
+    max-width: 600px;
+    max-height: 350px;
+}
+
+.exmp {
+    object-fit: scale-down;
+    width: auto;
+    height: auto;
+}
+
+.newsUrl {
+    display: block;
+    text-align: center;
 }
 
 /*texts*/
@@ -558,6 +626,24 @@ a:hover {
     text-decoration: none;
 }
 
+button:disabled,
+button[disabled] {
+    color: #ccc;
+}
+
+    button:disabled:focus,
+    button[disabled]:focus {
+        text-decoration: none;
+    }
+
+.addPost {
+    display: flex;
+    flex-direction: row-reverse;
+}
+
+.addPost:hover {
+    text-decoration: none;
+}
 /*---buttons---*/
 
 

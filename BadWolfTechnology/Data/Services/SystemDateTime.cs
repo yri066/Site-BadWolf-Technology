@@ -1,6 +1,6 @@
 ﻿using BadWolfTechnology.Data.Interfaces;
 
-namespace BadWolfTechnology.Data
+namespace BadWolfTechnology.Data.Services
 {
     public class SystemDateTime : IDateTime
     {
