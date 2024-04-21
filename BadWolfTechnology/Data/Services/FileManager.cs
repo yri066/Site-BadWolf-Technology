@@ -1,13 +1,15 @@
-﻿namespace BadWolfTechnology.Data.Services
+﻿using BadWolfTechnology.Data.Interfaces;
+
+namespace BadWolfTechnology.Data.Services
 {
-    public class FileManager
+    public class FileManager : IFileManager
     {
         /// <summary>
         /// Проверка что передаваемый файл является изображением.
         /// </summary>
         /// <param name="file">Передаваемый файл.</param>
         /// <returns>true - файл является изображением, false - файл другого типа.</returns>
-        public static bool CheckIsImage(IFormFile file)
+        public bool CheckIsImage(IFormFile file)
         {
             string[] contentTypeImage = { "image/jpg", "image/jpeg", "image/png", "image/webp" };
 
@@ -19,7 +21,7 @@
         /// </summary>
         /// <param name="file">Передаваемый файл.</param>
         /// <returns>Расширение файла.</returns>
-        public static string GetFileExtension(IFormFile file)
+        public string GetFileExtension(IFormFile file)
         {
             return Path.GetExtension(file.FileName);
         }
@@ -31,7 +33,7 @@
         /// <param name="fileName">Имя файла с расширением.</param>
         /// <param name="file">Передаваемый файл.</param>
         /// <returns></returns>
-        public static async Task SaveFile(string path, string fileName, IFormFile file)
+        public async Task SaveFile(string path, string fileName, IFormFile file)
         {
             Console.WriteLine("Save file");
             if (!Directory.Exists(path))
@@ -55,7 +57,7 @@
         /// <param name="image">Передаваемый файл.</param>
         /// <returns></returns>
         /// <exception cref="Exception">Не удалось сохранить файл.</exception>
-        public static async Task<string> UploadImageAsync(string folderName, string? fileName, IFormFile image)
+        public async Task<string> UploadImageAsync(string folderName, string? fileName, IFormFile image)
         {
             if (image != null && !CheckIsImage(image))
             {
@@ -88,7 +90,7 @@
         /// <param name="destFolderName">Имя новой папки.</param>
         /// <param name="fileName">Имя файла с расширением.</param>
         /// <exception cref="Exception">Не удалось сохранить файл.</exception>
-        public static void MoveImage(string sourceFolderName, string destFolderName, string fileName)
+        public void MoveImage(string sourceFolderName, string destFolderName, string fileName)
         {
             var sourceFileName = Path.Combine(Environment.CurrentDirectory, "wwwroot", "image", sourceFolderName, fileName);
             var destFileName = Path.Combine(Environment.CurrentDirectory, "wwwroot", "image", destFolderName, fileName);

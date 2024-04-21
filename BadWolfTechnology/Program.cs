@@ -32,6 +32,7 @@ namespace BadWolfTechnology
             builder.Services.AddSingleton<IEmailConfiguration>(emailConfig);
             builder.Services.AddTransient<IEmailSender, EmailSender>();
             builder.Services.AddSingleton<IDateTime, SystemDateTime>();
+            builder.Services.AddTransient<IFileManager, FileManager>();
 
             var app = builder.Build();
 
