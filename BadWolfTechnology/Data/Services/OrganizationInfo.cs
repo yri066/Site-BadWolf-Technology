@@ -1,4 +1,4 @@
-﻿namespace BadWolfTechnology.Data
+﻿namespace BadWolfTechnology.Data.Services
 {
     public class OrganizationInfo
     {
