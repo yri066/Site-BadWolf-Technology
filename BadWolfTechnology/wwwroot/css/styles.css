@@ -937,7 +937,8 @@ input[type='password'] {
 }
 
 .dropdown-content a,
-.dropdown-content input {
+.dropdown-content input,
+.dropdown-content div {
     color: black;
     padding: 10px;
     text-decoration: none;
@@ -950,7 +951,8 @@ input[type='password'] {
 }
 
 .dropdown-content a:hover,
-.dropdown-content input:hover {
+.dropdown-content input:hover
+.dropdown-content div:hover {
     background-color: #ddd;
 }
 

@@ -135,8 +135,23 @@ namespace BadWolfTechnology.Controllers
         // POST: NewsController/Delete/5
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public ActionResult DeleteAsync(Guid id)
+        public async Task<ActionResult> DeleteAsync(Guid id)
         {
+            var news = await _context.News.Include(news => news.Comments).FirstOrDefaultAsync(news => news.Id == id);
+
+            if(news == null)
+            {
+                return NotFound();
+            }
+
+            news.IsDelete = true;
+            foreach(var comment in news.Comments)
+            {
+                comment.IsDeleted = true;
+            }
+
+            await _context.SaveChangesAsync();
+
             try
             {
                 return RedirectToAction(nameof(Index));

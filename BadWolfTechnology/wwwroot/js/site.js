@@ -13,7 +13,5 @@ function localDate(date, spacer = "-") {
         ("0" + localDate.getHours()).slice(-2) + ":" +
         ("0" + localDate.getMinutes()).slice(-2);
 
-    console.log(date);
-    console.log(localDate);
     return formattedDate;
 }

@@ -2,8 +2,8 @@
 
 @{
 }
-
 <link href="~/lib/quill/dist/quill.snow.css" rel="stylesheet" />
+<script src="/lib/HTMLString/html-string.min.js"></script>
 <a asp-action="Create" class="addPost"><button class="btn">Добавить новость</button></a>
 <br />
 @if (Model.Count() > 0)
@@ -16,6 +16,19 @@
                     <a asp-action="Details" asp-route-id="@item.Id">
                         <h2>@item.Title</h2>
                     </a>
+                </div>
+                <div class="addPost">
+                    <div class="dropdown">
+                        <input id="@item.Id" type="checkbox" name="menu" class="dropbtn" />
+                        <label for="@item.Id" class="droplab">···</label>
+                        <div class="dropdown-content">
+                            <a asp-action="Edit" asp-route-Id="@item.Id">Редактировать</a>
+                            <form method="post" asp-action="Delete">
+                                <input type="hidden" name="id" value="@item.Id">
+                                <input type="submit" onclick="return confirmationDelete();" value="Удалить">
+                            </form>
+                        </div>
+                    </div>
                 </div>
             </div>
             <div class="text" style="padding:10px;">
@@ -30,7 +43,7 @@
                         }
                         <div class="ql-snow">
                             <div class="ql-editor">
-                                <div class="text-overflow-ellipses">
+                                <div class="text-overflow-content">
                                     @Html.Raw(item.Text)
                                 </div>
                             </div>
@@ -42,31 +55,49 @@
                 </div>
             </div>
             <div class="newsbottom">
-                Добавлено: <font color="cccccc">@item.Created.ToString("dd-MM-yy, H:mm")</font> | Комментариев: <font color="#ffc500">@item.CommentCount</font>
+                Добавлено: <font color="cccccc">
+                    <script>document.write(localDate("@item.Created.ToString("yyyy-MM-ddTHH:mmZ")"));</script>
+                </font> | Комментариев: <font color="#ffc500">@item.CommentCount</font>
             </div>
         </div>
         <br>
     }
-    <div class="pagination">
-    @if(Model.HasPreviousPage)
+    @if (Model.HasPreviousPage || Model.HasNextPage)
     {
-            <a asp-action="Index" asp-route-Page="@(Model.PageIndex - 1)"><button class="btn">Предыдущая</button></a>
-        }
-        else
-        {
-            <button disabled>Предыдущая</button>
-        }
-        @if (Model.HasNextPage)
-    {
-        <a asp-action="Index" asp-route-Page="@(Model.PageIndex + 1)"><button class="btn">Следующая</button></a>
+        <div class="pagination">
+            @if (Model.HasPreviousPage)
+            {
+                <a asp-action="Index" asp-route-Page="@(Model.PageIndex - 1)"><button class="btn">Предыдущая</button></a>
+            }
+            else
+            {
+                <button disabled>Предыдущая</button>
+            }
+            @if (Model.HasNextPage)
+            {
+                <a asp-action="Index" asp-route-Page="@(Model.PageIndex + 1)"><button class="btn">Следующая</button></a>
+            }
+            else
+            {
+                <button disabled>Следующая</button>
+            }
+        </div>
     }
-        else
-        {
-            <button disabled>Следующая</button>
-        }
-    </div>
 }
 else
 {
     <h1>Новостей пока еще нет.</h1>
 }
+
+<script>
+    let items = document.querySelectorAll('.text-overflow-content');
+    items.forEach((text) => {
+        let myString = new HTMLString.String(text.innerHTML, saveWhitespace = false);
+        text.innerHTML = myString.slice(0, 750).html();
+    })
+</script>
+<script>
+    function confirmationDelete() {
+        return confirm('Вы действительно хотите удалить данную статью?');
+    }
+</script>
