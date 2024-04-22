@@ -122,29 +122,6 @@ div {
     font-size: 13px
 }
 
-.redacktirovanie {
-    width: 33px;
-    height: 33px;
-    margin: 0;
-    padding: 0;
-    border: 0;
-    background: transparent url(‘путь к картинке’) no-repeat center top;
-    text-indent: -1000em;
-    cursor: pointer;
-    cursor: hand;
-}
-
-.delete {
-    width: 33px;
-    height: 33px;
-    margin: 0;
-    padding: 0;
-    border: 0;
-    background: transparent url('badwolf.tech/files/delete.png') no-repeat center top;
-    cursor: pointer;
-    cursor: hand;
-}
-
 .cookie_wrap {
     display: flex;
     flex-flow: row nowrap;

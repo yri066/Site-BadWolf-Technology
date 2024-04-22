@@ -13,6 +13,7 @@ namespace BadWolfTechnology.Data
         public DateTime Created { get; set; }
         public ApplicationUser User { get; set; } = null!;
         public Comment? Parent { get; set; }
+        public News News { get; set; } = null!;
 
         public bool HasParent(Comment parent)
         {

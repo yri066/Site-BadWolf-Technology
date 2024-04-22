@@ -84,6 +84,9 @@ body {
     border-top-right-radius: 5px;
     padding: 5px;
     font-size: 16px;
+    display: flex;
+    justify-content: space-between;
+    align-items: baseline;
 }
 
 .newstitle1 {
@@ -195,6 +198,81 @@ body {
     border-radius: 5px;
 }
 
+.comment {
+    margin: 15px 0 0 0;
+}
+
+.reply {
+    margin: 0 0 0 20px;
+}
+
+.comment-text-form {
+    width: 100%;
+    height: 100px;
+    padding: 10px;
+    border-radius: 4px;
+    resize: none;
+    margin: 10px 0 ;
+}
+
+.comment-text {
+    background: #161616;
+    padding: 10px;
+    border-radius: 7px;
+    -webkit-border-radius: 7px;
+    -moz-border-radius: 7px;
+    color: #ccc;
+    line-height: 17px;
+    font-size: 11px;
+}
+
+.comment-text-content {
+    margin: 15px 0;
+    white-space: pre-line;
+}
+
+.comment-text-title {
+    border-bottom: 1px #454545 dashed;
+    padding: 0 0 5px 0;
+    margin: 0 0 5px 0;
+    font-size: 12px;
+    color: #ccc;
+    display: flex;
+    justify-content: space-between;
+}
+
+.comment-text-more {
+    padding: 3px 0 0 0;
+    font-size: 12px;
+    color: #999;
+    border-top: 1px #454545 dashed;
+    display: flex;
+    justify-content: space-between;
+}
+
+.reply-comment {
+    user-select: none;
+}
+
+.addPost.reply-comment:hover,
+.reply-comment:hover {
+    text-decoration: underline;
+    color: #ffc500;
+    cursor: pointer;
+}
+
+
+textarea:disabled {
+    color: #ccc;
+}
+
+.create-form,
+.reply-form {
+    margin: 10px 0;
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: flex-end;
+}
 
 
 .Title {
@@ -238,7 +316,7 @@ body {
     color: #ccc !important;
 }
 
-.text-overflow-ellipses {
+.text-overflow-content {
     word-break: break-word;
     overflow: hidden;
     display: -webkit-box;
@@ -248,7 +326,7 @@ body {
     max-height: 21 em;
 }
 
-.text-overflow {
+.text-content {
     word-break: break-word;
     text-align: left;
     line-height: 1.3em;
@@ -269,6 +347,16 @@ body {
     display: block;
     text-align: center;
 }
+
+.delete {
+    width:  33px;  
+    height: 33px; 
+    margin: 0;
+    padding:0;
+    border: 0;
+    cursor: pointer; 
+    cursor: hand; 
+    }
 
 /*texts*/
 
@@ -639,6 +727,7 @@ button[disabled] {
 .addPost {
     display: flex;
     flex-direction: row-reverse;
+    color: #ccc;
 }
 
 .addPost:hover {
@@ -812,4 +901,131 @@ h6,
 input[type='text'],
 input[type='password'] {
     position: relative;
+}
+
+/*---Выпадающее меню---*/
+.dropbtn {
+    display: none;
+}
+
+.droplab {
+    background-color: #161616;
+    color: white;
+    padding: 0 5px;
+    font-size: 20px;
+    border-radius: 4px;
+    user-select: none;
+}
+
+.dropdown {
+    position: relative;
+    display: flex;
+    align-content: stretch;
+    justify-content: flex-end;
+    align-items: baseline;
+}
+
+.dropdown-content {
+    display: none;
+    position: absolute;
+    background-color: #f1f1f1;
+    min-width: 160px;
+    box-shadow: 0px 8px 16px 0px rgba(0, 0, 0, 0.2);
+    z-index: 1;
+    margin: 25px 0;
+    border-radius: 4px;
+}
+
+.dropdown-content a,
+.dropdown-content input {
+    color: black;
+    padding: 10px;
+    text-decoration: none;
+    display: block;
+    font-size: 16px;
+    border-radius: 4px;
+    border: 0px;
+    width: -webkit-fill-available;
+    text-align: left;
+}
+
+.dropdown-content a:hover,
+.dropdown-content input:hover {
+    background-color: #ddd;
+}
+
+.dropbtn:checked~.dropdown-content {
+    display: block;
+}
+
+/*---Выпадающее меню---*/
+
+#snackbar {
+    visibility: hidden;
+    min-width: 250px;
+    margin-left: -125px;
+    background-color: maroon;
+    color: #fff;
+    text-align: center;
+    border-radius: 2px;
+    padding: 16px;
+    position: fixed;
+    z-index: 1;
+    left: 50%;
+    bottom: 30px;
+    font-size: 17px;
+}
+
+    #snackbar.show {
+        visibility: visible;
+        -webkit-animation: fadein 0.5s, fadeout 0.5s 2.6s;
+        animation: fadein 0.5s, fadeout 0.5s 2.6s;
+    }
+
+@-webkit-keyframes fadein {
+    from {
+        bottom: 0;
+        opacity: 0;
+    }
+
+    to {
+        bottom: 30px;
+        opacity: 1;
+    }
+}
+
+@keyframes fadein {
+    from {
+        bottom: 0;
+        opacity: 0;
+    }
+
+    to {
+        bottom: 30px;
+        opacity: 1;
+    }
+}
+
+@-webkit-keyframes fadeout {
+    from {
+        bottom: 30px;
+        opacity: 1;
+    }
+
+    to {
+        bottom: 0;
+        opacity: 0;
+    }
+}
+
+@keyframes fadeout {
+    from {
+        bottom: 30px;
+        opacity: 1;
+    }
+
+    to {
+        bottom: 0;
+        opacity: 0;
+    }
 }

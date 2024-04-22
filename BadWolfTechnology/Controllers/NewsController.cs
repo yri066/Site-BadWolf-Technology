@@ -1,12 +1,13 @@
 ﻿using BadWolfTechnology.Areas.Identity.Data;
 using BadWolfTechnology.Data;
 using BadWolfTechnology.Data.Interfaces;
-using BadWolfTechnology.Data.Services;
 using BadWolfTechnology.Models;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.IdentityModel.Tokens;
 using System.ComponentModel.DataAnnotations;
+using System.Text.RegularExpressions;
 
 namespace BadWolfTechnology.Controllers
 {
@@ -15,20 +16,21 @@ namespace BadWolfTechnology.Controllers
         private readonly ApplicationDbContext _context;
         private readonly UserManager<ApplicationUser> _userManager;
         private readonly IDateTime _dateTime;
+        private readonly IFileManager _fileManager;
 
-        public NewsController(ApplicationDbContext context, UserManager<ApplicationUser> userManager, IDateTime dateTime)
+        public NewsController(ApplicationDbContext context, UserManager<ApplicationUser> userManager, IDateTime dateTime, IFileManager fileManager)
         {
             _context = context;
             _userManager = userManager;
             _dateTime = dateTime;
+            _fileManager = fileManager;
         }
 
-        [BindProperty]
         public NewsEdit Input { get; set; }
 
 
         // GET: NewsController
-        public async Task<ActionResult> Index(int Page)
+        public async Task<ActionResult> Index(int Page = 1)
         {
             int defaultPageSize = 4;
 
@@ -43,7 +45,7 @@ namespace BadWolfTechnology.Controllers
                 Title = news.Title,
                 ImageName = news.ImageName,
                 Text = news.Text,
-                CommentCount = news.Comments.Count,
+                CommentCount = news.Comments.Where(comment => !comment.IsDeleted).Count(),
                 IsView = news.IsView,
                 IsDelete = news.IsDelete,
                 Created = news.Created
@@ -67,11 +69,16 @@ namespace BadWolfTechnology.Controllers
         [Route("News/{id:guid}")]
         public async Task<ActionResult> Details(Guid id)
         {
-            var news = await _context.News.Include(news => news.Comments).AsNoTracking().FirstOrDefaultAsync(x => x.Id == id);
+            var news = _context.News.Include(n => n.Comments).ThenInclude(comment => comment.Parent).FirstOrDefault(x => x.Id == id);
 
             if (news is null || news.IsDelete)
             {
                 return NotFound();
+            }
+
+            foreach (var comment in news.Comments)
+            {
+                _context.Entry(comment).Reference(comment => comment.User).Load();
             }
 
             return View(news);
@@ -87,8 +94,9 @@ namespace BadWolfTechnology.Controllers
         // POST: NewsController/Create
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<ActionResult> Create(IFormFile? image)
+        public async Task<ActionResult> Create([Bind] NewsEdit Input, IFormFile? image)
         {
+            this.Input = Input;
             return await SaveNewsAsync(image);
         }
 
@@ -118,21 +126,16 @@ namespace BadWolfTechnology.Controllers
         // POST: NewsController/Edit/5
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<ActionResult> EditAsync(Guid id, IFormFile? image)
+        public async Task<ActionResult> EditAsync(Guid id, [Bind] NewsEdit Input, IFormFile? image)
         {
+            this.Input = Input;
             return await SaveNewsAsync(image, id);
-        }
-
-        // GET: NewsController/Delete/5
-        public ActionResult Delete(int id)
-        {
-            return View();
         }
 
         // POST: NewsController/Delete/5
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public ActionResult Delete(int id, IFormCollection collection)
+        public ActionResult DeleteAsync(Guid id)
         {
             try
             {
@@ -142,6 +145,51 @@ namespace BadWolfTechnology.Controllers
             {
                 return View();
             }
+        }
+
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        [Route("News/{id:guid}/CreateComment")]
+        public async Task<ActionResult> CreateComment(Guid id, [Bind("Text")] [StringLength(maximumLength:500, MinimumLength = 2)]string Text, long? ReplyId)
+        {
+            if(!ModelState.IsValid)
+            {
+                return BadRequest();
+            }
+
+            var source = _context.News.Where(news => news.Id == id && !news.IsDelete);
+
+            if(ReplyId is not null)
+            {
+                source = source.Include(news => news.Comments.Where(comment => comment.Id == ReplyId));
+            }
+
+            var news = await source.FirstOrDefaultAsync();
+
+            if (news == null)
+            {
+                return NotFound();
+            }
+
+            if (ReplyId != null && news.Comments.IsNullOrEmpty())
+            {
+                return NotFound();
+            }
+
+            var comment = new Comment
+            {
+                Created = _dateTime.UtcNow,
+                Parent = news.Comments.FirstOrDefault(),
+                News = news,
+                // Удалить пустые строки и повторяющиеся пробелы.
+                Text = Regex.Replace(Text, @"^\s*(\r\n|\z)", "", RegexOptions.Multiline),
+                User = await _userManager.GetUserAsync(User)
+            };
+
+            news.Comments.Add(comment);
+            await _context.SaveChangesAsync();
+
+            return Json(new { id = comment.Id, login = comment.User.UserName, comment.Text, date = comment.Created.ToString("yyyy-MM-ddTHH:mmZ") });
         }
 
         /// <summary>
@@ -158,7 +206,7 @@ namespace BadWolfTechnology.Controllers
             {
                 try
                 {
-                    Input.TempImageName = await FileManager.UploadImageAsync("Temp", Input.TempImageName, image);
+                    Input.TempImageName = await _fileManager.UploadImageAsync("Temp", Input.TempImageName, image);
                 }
                 catch (Exception ex)
                 {
@@ -176,7 +224,7 @@ namespace BadWolfTechnology.Controllers
             {
                 try
                 {
-                    FileManager.MoveImage("Temp", "News", Input.TempImageName);
+                    _fileManager.MoveImage("Temp", "News", Input.TempImageName);
                     Input.ImageName = Input.TempImageName;
                 }
                 catch (Exception ex)
@@ -186,7 +234,7 @@ namespace BadWolfTechnology.Controllers
                 }
             }
 
-            if(id == default)
+            if (id == default)
             {
                 var news = new News()
                 {
@@ -204,9 +252,9 @@ namespace BadWolfTechnology.Controllers
             }
             else
             {
-                var news = await _context.News.FirstOrDefaultAsync(news => news.Id == id);
+                var news = await _context.News.Where(news => !news.IsDelete).FirstOrDefaultAsync(news => news.Id == id);
 
-                if(news == null)
+                if (news == null)
                 {
                     return NotFound();
                 }
