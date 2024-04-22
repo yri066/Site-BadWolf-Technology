@@ -207,6 +207,24 @@ namespace BadWolfTechnology.Controllers
             return Json(new { id = comment.Id, login = comment.User.UserName, comment.Text, date = comment.Created.ToString("yyyy-MM-ddTHH:mmZ") });
         }
 
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        [Route("News/{id:guid}/DeleteComment")]
+        public async Task<ActionResult> DeleteComment(Guid id, long commentId)
+        {
+            var comment = await _context.Comments.Include(comment => comment.News).Where(comment => comment.News.Id == id).FirstOrDefaultAsync(comment => comment.Id == commentId);
+            
+            if(comment == null)
+            {
+                return NotFound();
+            }
+
+            comment.IsDeleted = true;
+            await _context.SaveChangesAsync();
+
+            return RedirectToAction(nameof(Details), new {id});
+        }
+
         /// <summary>
         /// Сохранить новость.
         /// </summary>

@@ -8,6 +8,19 @@
         <div class="text3">
             <h2>@Model.Title</h2>
         </div>
+        <div class="addPost">
+            <div class="dropdown">
+                <input id="@Model.Id" type="checkbox" name="menu" class="dropbtn" />
+                <label for="@Model.Id" class="droplab">···</label>
+                <div class="dropdown-content">
+                    <a asp-action="Edit" asp-route-Id="@Model.Id">Редактировать</a>
+                    <form method="post" asp-action="Delete">
+                        <input type="hidden" name="commentId" value="@Model.Id">
+                        <input type="submit" onclick="return confirmationDelete();" value="Удалить">
+                    </form>
+                </div>
+            </div>
+        </div>
     </div>
     <div class="text" style="padding:10px;">
         <div style="display:inline;">
@@ -206,6 +219,51 @@
         commentUser.className = 'comment-text-title';
         commentUser.textContent = commentData.login;
         newComment.appendChild(commentUser);
+
+        let divAddPost = document.createElement('div');
+        divAddPost.className = 'addPost';
+
+        let dropdown = document.createElement('div');
+        dropdown.className = 'dropdown';
+        divAddPost.appendChild(dropdown);
+
+        let checkbox = document.createElement('input');
+        checkbox.className = 'dropbtn';
+        checkbox.type = 'checkbox';
+        checkbox.id = 'id_'+commentData.id;
+        dropdown.appendChild(checkbox);
+
+        let label = document.createElement('label');
+        label.className = 'droplab';
+        label.textContent = '···';
+        label.htmlFor = 'id_'+commentData.id;
+        dropdown.appendChild(label);
+
+        let dropdownContent = document.createElement('div');
+        dropdownContent.className = 'dropdown-content';
+        dropdown.appendChild(dropdownContent);
+
+        let deteteBtn = document.createElement('div');
+        deteteBtn.textContent = 'Удалить';
+        deteteBtn.onclick = function () {
+
+            let formData = new FormData();
+            formData.set("commentId", commentData.id);
+            formData.set("__RequestVerificationToken", document.getElementsByName("__RequestVerificationToken")[0].value);
+
+            fetch(`${location.href}/DeleteComment`, {
+                method: 'POST',
+                body: formData,
+            })
+            .then(response => {
+                if (!response.ok) {
+                    showToast("Не удалось удалить комментарий.")
+                }
+                window.location.reload(); 
+            })
+        };
+        dropdownContent.appendChild(deteteBtn);
+        commentUser.appendChild(divAddPost);
 
         let commentText = document.createElement('div');
         commentText.className = 'text comment-text-content';

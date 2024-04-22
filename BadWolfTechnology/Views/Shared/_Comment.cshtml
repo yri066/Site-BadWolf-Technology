@@ -5,29 +5,45 @@ For more information on enabling MVC for empty projects, visit https://go.micros
 @{
 }
 
-@if(Model.IsDeleted)
+@if (Model.IsDeleted)
 {
-<div class="comment BoxNews comment-text">
-    <div class="text comment-text-content">Комментарий был удален.</div>
-</div>
+    if (Model.Parent == null)
+    {
+        <div class="comment BoxNews comment-text">
+            <div class="text comment-text-content">Комментарий был удален.</div>
+        </div>
+    }
 }
 else
 {
-<div class="comment BoxNews comment-text" id="@Model.Id">
-    <div class="comment-text-title">
-        <a>@Model.User.UserName</a>
+    <div class="comment BoxNews comment-text" id="@Model.Id">
+        <div class="comment-text-title">
+            <a>@Model.User.UserName</a>
+            <div class="addPost">
+                <div class="dropdown">
+                    <input id="id_@Model.Id" type="checkbox" name="menu" class="dropbtn" />
+                    <label for="id_@Model.Id" class="droplab">···</label>
+                    <div class="dropdown-content">
+                        <form method="post" action="@Context.Request.Path/DeleteComment">
+                            <input type="hidden" name="commentId" value="@Model.Id">
+                            @Html.AntiForgeryToken()
+                            <input type="submit" value="Удалить">
+                        </form>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="text comment-text-content">@Model.Text</div>
+        <div class="comment-text-more">
+            <script>document.write(localDate("@Model.Created.ToString("yyyy-MM-ddTHH:mm:00Z")", "."));</script>
+            @if (Model.Parent == null)
+            {
+                <div class="addPost reply-comment reply-btn" data-comment-id="@Model.Id">Ответить</div>
+            }
+            else
+            {
+                <div class="addPost reply-comment reply-comment-btn" data-comment-id="@Model.Id">Ответить</div>
+            }
+        </div>
     </div>
-    <div class="text comment-text-content">@Model.Text</div>
-    <div class="comment-text-more">
-        <script>document.write(localDate("@Model.Created.ToString("yyyy-MM-ddTHH:mm:00Z")", "."));</script>
-        @if (Model.Parent == null)
-        {
-            <div class="addPost reply-comment reply-btn" data-comment-id="@Model.Id">Ответить</div>
-        }
-        else
-        {
-            <div class="addPost reply-comment reply-comment-btn" data-comment-id="@Model.Id">Ответить</div>
-        }
-    </div>
-</div>
 }
