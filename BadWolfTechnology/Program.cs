@@ -4,6 +4,7 @@ using BadWolfTechnology.Data;
 using BadWolfTechnology.Data.Interfaces;
 using BadWolfTechnology.Data.Services;
 using BadWolfTechnology.Services;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity.UI.Services;
 using Microsoft.EntityFrameworkCore;
 
@@ -37,6 +38,12 @@ namespace BadWolfTechnology
             builder.Services.AddTransient<IEmailSender, EmailSender>();
             builder.Services.AddSingleton<IDateTime, SystemDateTime>();
             builder.Services.AddTransient<IFileManager, FileManager>();
+
+            builder.Services.AddScoped<IAuthorizationHandler, CommentUserAuthorizationHandler>();
+            builder.Services.AddSingleton<IAuthorizationHandler, CommentManagerAdministratorAuthorizationHandler>();
+
+            builder.Services.AddSingleton<IAuthorizationHandler, NewsManagerAuthorizationHandler>();
+            builder.Services.AddSingleton<IAuthorizationHandler, NewsAdministratorAuthorizationHandler>();
 
             var app = builder.Build();
 

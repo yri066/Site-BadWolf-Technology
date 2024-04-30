@@ -1,10 +1,15 @@
 ﻿@model PaginatedList<IPublication>
+@using Microsoft.AspNetCore.Identity
+@inject SignInManager<ApplicationUser> SignInManager
 
 @{
 }
 <link href="~/lib/quill/dist/quill.snow.css" rel="stylesheet" />
 <script src="/lib/HTMLString/html-string.min.js"></script>
-<a asp-action="Create" class="addPost"><button class="btn">Добавить новость</button></a>
+@if ((await AuthorizationService.AuthorizeAsync(User, null, NewsOperations.Create)).Succeeded)
+{
+    <a asp-action="Create" class="addPost"><button class="btn">Добавить новость</button></a>
+}
 <br />
 @if (Model.Count() > 0)
 {
@@ -17,19 +22,25 @@
                         <h2>@item.Title</h2>
                     </a>
                 </div>
-                <div class="addPost">
-                    <div class="dropdown">
-                        <input id="@item.Id" type="checkbox" name="menu" class="dropbtn" />
-                        <label for="@item.Id" class="droplab">···</label>
-                        <div class="dropdown-content">
-                            <a asp-action="Edit" asp-route-Id="@item.Id">Редактировать</a>
-                            <form method="post" asp-action="Delete">
-                                <input type="hidden" name="id" value="@item.Id">
-                                <input type="submit" onclick="return confirmationDelete();" value="Удалить">
-                            </form>
+                @if ((await AuthorizationService.AuthorizeAsync(User, item, NewsOperations.Update)).Succeeded)
+                {
+                    <div class="addPost">
+                        <div class="dropdown">
+                            <input id="@item.Id" type="checkbox" name="menu" class="dropbtn" />
+                            <label for="@item.Id" class="droplab">···</label>
+                            <div class="dropdown-content">
+                                <a asp-action="Edit" asp-route-Id="@item.Id">Редактировать</a>
+                                @if ((await AuthorizationService.AuthorizeAsync(User, item, NewsOperations.Delete)).Succeeded)
+                                {
+                                    <form method="post" asp-action="Delete">
+                                        <input type="hidden" name="id" value="@item.Id">
+                                        <input type="submit" onclick="return confirmationDelete();" value="Удалить">
+                                    </form>
+                                }
+                            </div>
                         </div>
                     </div>
-                </div>
+                }
             </div>
             <div class="text" style="padding:10px;">
                 <div style="display:inline;">
@@ -96,8 +107,11 @@ else
         text.innerHTML = myString.slice(0, 750).html();
     })
 </script>
-<script>
-    function confirmationDelete() {
-        return confirm('Вы действительно хотите удалить данную статью?');
-    }
-</script>
+@if ((await AuthorizationService.AuthorizeAsync(User, null, NewsOperations.Delete)).Succeeded)
+{
+    <script>
+        function confirmationDelete() {
+            return confirm('Вы действительно хотите удалить данную статью?');
+        }
+    </script>
+}

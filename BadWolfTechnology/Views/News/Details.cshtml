@@ -1,4 +1,6 @@
 ﻿@model News
+@using Microsoft.AspNetCore.Identity
+@inject SignInManager<ApplicationUser> SignInManager
 @{
 }
 <link href="~/lib/quill/dist/quill.snow.css" rel="stylesheet" />
@@ -8,19 +10,25 @@
         <div class="text3">
             <h2>@Model.Title</h2>
         </div>
-        <div class="addPost">
-            <div class="dropdown">
-                <input id="@Model.Id" type="checkbox" name="menu" class="dropbtn" />
-                <label for="@Model.Id" class="droplab">···</label>
-                <div class="dropdown-content">
-                    <a asp-action="Edit" asp-route-Id="@Model.Id">Редактировать</a>
-                    <form method="post" asp-action="Delete">
-                        <input type="hidden" name="commentId" value="@Model.Id">
-                        <input type="submit" onclick="return confirmationDelete();" value="Удалить">
-                    </form>
+        @if ((await AuthorizationService.AuthorizeAsync(User, Model, NewsOperations.Update)).Succeeded)
+        {
+            <div class="addPost">
+                <div class="dropdown">
+                    <input id="@Model.Id" type="checkbox" name="menu" class="dropbtn" />
+                    <label for="@Model.Id" class="droplab">···</label>
+                    <div class="dropdown-content">
+                        <a asp-action="Edit" asp-route-Id="@Model.Id">Редактировать</a>
+                        @if ((await AuthorizationService.AuthorizeAsync(User, Model, NewsOperations.Delete)).Succeeded)
+                        {
+                            <form method="post" asp-action="Delete">
+                                <input type="hidden" name="id" value="@Model.Id">
+                                <input type="submit" onclick="return confirmationDelete();" value="Удалить">
+                            </form>
+                        }
+                    </div>
                 </div>
             </div>
-        </div>
+        }
     </div>
     <div class="text" style="padding:10px;">
         <div style="display:inline;">
@@ -63,311 +71,314 @@
     }
 </div>
 
-<br />
-<div class="BoxNews comment-text" id="0">
-    <form class="create-form">
-        <textarea class="comment-text-form" placeholder="Комментарий..." minlength="2" maxlength="500"
-            required></textarea>
-        <div class="addPost">
-            <button class="btn">Отправить</button>
-        </div>
-    </form>
-    @Html.AntiForgeryToken()
-</div>
-<div id="snackbar"></div>
+@if (SignInManager.IsSignedIn(User))
+{
+    <br />
+    <div class="BoxNews comment-text" id="0">
+        <form class="create-form">
+            <textarea class="comment-text-form" placeholder="Комментарий..." minlength="2" maxlength="500"
+                      required></textarea>
+            <div class="addPost">
+                <button class="btn">Отправить</button>
+            </div>
+        </form>
+        @Html.AntiForgeryToken()
+    </div>
+}
 
 <script src="~/lib/fancyapps/dist/fancybox.umd.js"></script>
 <link rel="stylesheet" href="~/lib/fancyapps/dist/fancybox.css" />
-<script>
-    function confirmationDelete() {
-        return confirm('Вы действительно хотите удалить данную статью?');
-    }
-</script>
+@if ((await AuthorizationService.AuthorizeAsync(User, Model, NewsOperations.Delete)).Succeeded)
+{
+    <script>
+        function confirmationDelete() {
+            return confirm('Вы действительно хотите удалить данную статью?');
+        }
+    </script>
+}
 <script>
     Fancybox.bind('[data-fancybox]', {
     });
 
-    // Добавить к родительскому дочерний комментарий
-    let addChildrenToParentComment = function (newComment) {
-        if (!document.querySelector("[id='" + newComment.parentId + "'].reply")) {
-            let reply = document.createElement('div');
-            reply.classList.add('reply');
-            reply.id = newComment.parentId;
-
-            let comment = document.getElementById(newComment.parentId);
-            comment.parentNode.insertBefore(reply, comment.nextSibling);
-        }
-
-        let parentComment = document.querySelector("[id='" + newComment.parentId + "'].reply");
-        parentComment.append(newComment);
-    }
-
-    // Добавить новый родительский комментарий
-    let addNewParentComment = function (newComment) {
-        let comments = document.getElementById("comments");
-        comments.append(newComment);
-    }
-
-    // Добавить новый комментарий к дочерним комментириям
-    let addChildrenComment = function (newComment) {
-        let parentComment = document.getElementById(newComment.parentId).parentNode;
-        parentComment.append(newComment);
-    }
-
-    // Функция создания и добавления формы ответа
-    function createReplyForm(commentId, addComment) {
-        if (document.getElementById(commentId).querySelector('.reply-form') !== null) {
-            document.getElementById(commentId).querySelector('.reply-form').remove();
-            return;
-        }
-        // Создание элемента формы
-        let form = document.createElement('form');
-        form.classList.add('reply-form');
-        form.dataset.commentId = commentId;
-
-        // Создание textarea для ответа
-        let textarea = document.createElement('textarea');
-        textarea.className = 'comment-text-form';
-        textarea.placeholder = 'Комментарий...';
-        textarea.minLength = 2;
-        textarea.maxLength = 500;
-        textarea.required = true;
-        form.appendChild(textarea);
-
-        // Создание блока для кнопки ответа
-        let divAddPost = document.createElement('div');
-        divAddPost.className = 'addPost';
-        form.appendChild(divAddPost);
-
-        // Создание кнопки отправки сообщения
-        let submitBtn = document.createElement('button');
-        submitBtn.className = 'btn';
-        submitBtn.type = 'submit';
-        submitBtn.textContent = 'Отправить';
-        divAddPost.appendChild(submitBtn);
-
-        // Добавить форму к соответствующему комментарию
-        let comment = document.getElementById(commentId);
-        comment.append(form);
-
-        // Сфокусировать на textarea
-        textarea.focus();
-
-        // Отправка формы
-        form.addEventListener('submit', function (event) {
-            event.preventDefault(); // Предотвращение отправки формы по умолчанию
-
-            // Получить текст ответа
-            let replyText = textarea.value;
-            // Получить идентификатор комментария ответа
-            let commentId = form.dataset.commentId;
-
-            textarea.disabled = true;
-            submitBtn.disabled = true;
-
-            let data = {
-                parentId: commentId,
-                text: replyText
-            };
-
-            let formData = new FormData();
-            formData.append("ReplyId", commentId);
-            formData.set("Text", replyText);
-            formData.set("__RequestVerificationToken", document.getElementsByName("__RequestVerificationToken")[0].value);
-
-            // Отправка
-            fetch(`${location.href}/CreateComment`, {
-                method: 'POST',
-                body: formData,
-            })
-                .then(response => {
-                    if (!response.ok) {
-                        throw new Error('Failed to submit reply');
-                    }
-
-                    return response.text();
-                })
-                .then(json => {
-
-                    let comment = JSON.parse(json);
-
-                    data.id = comment.id;
-                    data.login = comment.login;
-                    data.date = comment.date;
-                    data.text = comment.text;
-                    displayComment(data, addComment);
-                    form.remove();
-                })
-                .catch(error => {
-                    textarea.disabled = false;
-                    submitBtn.disabled = false;
-                    showToast("Не удалось отправить комментарий.")
-                });
-
-        });
-    }
-
-    // Вывести комментарий
-    function displayComment(commentData, addComment) {
-
-        let newComment = document.createElement('div');
-        newComment.className = 'comment BoxNews comment-text';
-        newComment.id = commentData.id;
-        newComment.parentId = commentData.parentId;
-
-        let commentUser = document.createElement('div');
-        commentUser.className = 'comment-text-title';
-        commentUser.textContent = commentData.login;
-        newComment.appendChild(commentUser);
-
-        let divAddPost = document.createElement('div');
-        divAddPost.className = 'addPost';
-
-        let dropdown = document.createElement('div');
-        dropdown.className = 'dropdown';
-        divAddPost.appendChild(dropdown);
-
-        let checkbox = document.createElement('input');
-        checkbox.className = 'dropbtn';
-        checkbox.type = 'checkbox';
-        checkbox.id = 'id_'+commentData.id;
-        dropdown.appendChild(checkbox);
-
-        let label = document.createElement('label');
-        label.className = 'droplab';
-        label.textContent = '···';
-        label.htmlFor = 'id_'+commentData.id;
-        dropdown.appendChild(label);
-
-        let dropdownContent = document.createElement('div');
-        dropdownContent.className = 'dropdown-content';
-        dropdown.appendChild(dropdownContent);
-
-        let deteteBtn = document.createElement('div');
-        deteteBtn.textContent = 'Удалить';
-        deteteBtn.onclick = function () {
-
-            let formData = new FormData();
-            formData.set("commentId", commentData.id);
-            formData.set("__RequestVerificationToken", document.getElementsByName("__RequestVerificationToken")[0].value);
-
-            fetch(`${location.href}/DeleteComment`, {
-                method: 'POST',
-                body: formData,
-            })
-            .then(response => {
-                if (!response.ok) {
-                    showToast("Не удалось удалить комментарий.")
-                }
-                window.location.reload(); 
-            })
-        };
-        dropdownContent.appendChild(deteteBtn);
-        commentUser.appendChild(divAddPost);
-
-        let commentText = document.createElement('div');
-        commentText.className = 'text comment-text-content';
-        commentText.textContent = commentData.text;
-        newComment.appendChild(commentText);
-
-        let commentDate = document.createElement('div');
-        commentDate.className = 'comment-text-more';
-        commentDate.textContent = localDate(commentData.date);
-        newComment.appendChild(commentDate);
-
-        let submitBtn = document.createElement('div');
-        submitBtn.textContent = 'Ответить';
-        submitBtn.className = 'addPost reply-comment';
-        submitBtn.dataset.commentId = commentData.id;
-        submitBtn.onclick = function () {
-            if (commentData.parentId != null) {
-                createReplyForm(newComment.id, addChildrenComment);
-            }
-            else {
-                createReplyForm(newComment.id, addChildrenToParentComment);
-            }
-        };
-        commentDate.appendChild(submitBtn);
-
-        addComment(newComment);
-    }
-
-    document.addEventListener('DOMContentLoaded', function () {
-        // Добавление слушателей события клика ко всем кнопкам ответа к родительским сообщениям
-        let replyParentButtons = document.querySelectorAll('.reply-btn');
-        replyParentButtons.forEach(function (button) {
-            button.addEventListener('click', function () {
-                let commentId = this.dataset.commentId;
-                createReplyForm(commentId, addChildrenToParentComment);
-            });
-        });
-
-        // Добавление слушателей события клика ко всем кнопкам ответа к дочерним сообщениям
-        let replyChildrenButtons = document.querySelectorAll('.reply-comment-btn');
-        replyChildrenButtons.forEach(function (button) {
-            button.addEventListener('click', function () {
-                let commentId = this.dataset.commentId;
-                createReplyForm(commentId, addChildrenComment);
-            });
-        });
-
-        // Добавление слушателя события клика к форме отправки сообщения
-        let createButton = document.querySelector('.create-form');
-        createButton.addEventListener('submit', function (event) {
-            let text = document.querySelector('textarea').value;
-            createButton.querySelector('textarea').disabled = true;
-            createButton.querySelector('button').disabled = true;
-
-            let data = {
-                parentId: null,
-                text: text
-            };
-
-            let formData = new FormData();
-            formData.set("Text", text);
-            formData.set("__RequestVerificationToken", document.getElementsByName("__RequestVerificationToken")[0].value);
-
-            fetch(`${location.href}/CreateComment`, {
-                method: 'POST',
-                body: formData,
-            })
-                .then(response => {
-                    if (!response.ok) {
-                        throw new Error('Failed to submit reply');
-                    }
-
-                    return response.text();
-                })
-                .then(json => {
-
-                    let comment = JSON.parse(json);
-
-                    data.id = comment.id;
-                    data.login = comment.login;
-                    data.date = comment.date;
-                    data.text = comment.text;
-
-                    createButton.querySelector('textarea').value = null;
-                    createButton.querySelector('textarea').disabled = false;
-                    createButton.querySelector('button').disabled = false;
-                    displayComment(data, addNewParentComment);
-                })
-                .catch(error => {
-                    createButton.querySelector('textarea').disabled = false;
-                    createButton.querySelector('button').disabled = false;
-                    showToast("Не удалось отправить комментарий.")
-                });
-
-            event.preventDefault();
-        });
-
-    });
-
-    // Вывести уведомление о ошибке
-    function showToast(text) {
-        let toast = document.getElementById("snackbar");
-        toast.className = "show";
-        toast.textContent = text;
-        setTimeout(function () { toast.className = ""; }, 3000);
-    }
 </script>
+@if (SignInManager.IsSignedIn(User))
+{
+    <script>
+
+        // Добавить к родительскому дочерний комментарий
+        let addChildrenToParentComment = function (newComment) {
+            if (!document.querySelector("[id='" + newComment.parentId + "'].reply")) {
+                let reply = document.createElement('div');
+                reply.classList.add('reply');
+                reply.id = newComment.parentId;
+
+                let comment = document.getElementById(newComment.parentId);
+                comment.parentNode.insertBefore(reply, comment.nextSibling);
+            }
+
+            let parentComment = document.querySelector("[id='" + newComment.parentId + "'].reply");
+            parentComment.append(newComment);
+        }
+
+        // Добавить новый родительский комментарий
+        let addNewParentComment = function (newComment) {
+            let comments = document.getElementById("comments");
+            comments.append(newComment);
+        }
+
+        // Добавить новый комментарий к дочерним комментириям
+        let addChildrenComment = function (newComment) {
+            let parentComment = document.getElementById(newComment.parentId).parentNode;
+            parentComment.append(newComment);
+        }
+
+        // Функция создания и добавления формы ответа
+        function createReplyForm(commentId, addComment) {
+            if (document.getElementById(commentId).querySelector('.reply-form') !== null) {
+                document.getElementById(commentId).querySelector('.reply-form').remove();
+                return;
+            }
+            // Создание элемента формы
+            let form = document.createElement('form');
+            form.classList.add('reply-form');
+            form.dataset.commentId = commentId;
+
+            // Создание textarea для ответа
+            let textarea = document.createElement('textarea');
+            textarea.className = 'comment-text-form';
+            textarea.placeholder = 'Комментарий...';
+            textarea.minLength = 2;
+            textarea.maxLength = 500;
+            textarea.required = true;
+            form.appendChild(textarea);
+
+            // Создание блока для кнопки ответа
+            let divAddPost = document.createElement('div');
+            divAddPost.className = 'addPost';
+            form.appendChild(divAddPost);
+
+            // Создание кнопки отправки сообщения
+            let submitBtn = document.createElement('button');
+            submitBtn.className = 'btn';
+            submitBtn.type = 'submit';
+            submitBtn.textContent = 'Отправить';
+            divAddPost.appendChild(submitBtn);
+
+            // Добавить форму к соответствующему комментарию
+            let comment = document.getElementById(commentId);
+            comment.append(form);
+
+            // Сфокусировать на textarea
+            textarea.focus();
+
+            // Отправка формы
+            form.addEventListener('submit', function (event) {
+                event.preventDefault(); // Предотвращение отправки формы по умолчанию
+
+                // Получить текст ответа
+                let replyText = textarea.value;
+                // Получить идентификатор комментария ответа
+                let commentId = form.dataset.commentId;
+
+                textarea.disabled = true;
+                submitBtn.disabled = true;
+
+                let data = {
+                    parentId: commentId,
+                    text: replyText
+                };
+
+                let formData = new FormData();
+                formData.append("ReplyId", commentId);
+                formData.set("Text", replyText);
+                formData.set("__RequestVerificationToken", document.getElementsByName("__RequestVerificationToken")[0].value);
+
+                // Отправка
+                fetch(`${location.href}/CreateComment`, {
+                    method: 'POST',
+                    body: formData,
+                })
+                    .then(response => {
+                        if (!response.ok) {
+                            throw new Error('Failed to submit reply');
+                        }
+
+                        return response.text();
+                    })
+                    .then(json => {
+
+                        let comment = JSON.parse(json);
+
+                        data.id = comment.id;
+                        data.login = comment.login;
+                        data.date = comment.date;
+                        data.text = comment.text;
+                        displayComment(data, addComment);
+                        form.remove();
+                    })
+                    .catch(error => {
+                        textarea.disabled = false;
+                        submitBtn.disabled = false;
+                        showToast("Не удалось отправить комментарий.")
+                    });
+
+            });
+        }
+
+        // Вывести комментарий
+        function displayComment(commentData, addComment) {
+
+            let newComment = document.createElement('div');
+            newComment.className = 'comment BoxNews comment-text';
+            newComment.id = commentData.id;
+            newComment.parentId = commentData.parentId;
+
+            let commentUser = document.createElement('div');
+            commentUser.className = 'comment-text-title';
+            commentUser.textContent = commentData.login;
+            newComment.appendChild(commentUser);
+
+            let divAddPost = document.createElement('div');
+            divAddPost.className = 'addPost';
+
+            let dropdown = document.createElement('div');
+            dropdown.className = 'dropdown';
+            divAddPost.appendChild(dropdown);
+
+            let checkbox = document.createElement('input');
+            checkbox.className = 'dropbtn';
+            checkbox.type = 'checkbox';
+            checkbox.id = 'id_' + commentData.id;
+            dropdown.appendChild(checkbox);
+
+            let label = document.createElement('label');
+            label.className = 'droplab';
+            label.textContent = '···';
+            label.htmlFor = 'id_' + commentData.id;
+            dropdown.appendChild(label);
+
+            let dropdownContent = document.createElement('div');
+            dropdownContent.className = 'dropdown-content';
+            dropdown.appendChild(dropdownContent);
+
+            let deteteBtn = document.createElement('div');
+            deteteBtn.textContent = 'Удалить';
+            deteteBtn.onclick = function () {
+
+                let formData = new FormData();
+                formData.set("commentId", commentData.id);
+                formData.set("__RequestVerificationToken", document.getElementsByName("__RequestVerificationToken")[0].value);
+
+                fetch(`${location.href}/DeleteComment`, {
+                    method: 'POST',
+                    body: formData,
+                })
+                    .then(response => {
+                        if (!response.ok) {
+                            showToast("Не удалось удалить комментарий.")
+                        }
+                        window.location.reload();
+                    })
+            };
+            dropdownContent.appendChild(deteteBtn);
+            commentUser.appendChild(divAddPost);
+
+            let commentText = document.createElement('div');
+            commentText.className = 'text comment-text-content';
+            commentText.textContent = commentData.text;
+            newComment.appendChild(commentText);
+
+            let commentDate = document.createElement('div');
+            commentDate.className = 'comment-text-more';
+            commentDate.textContent = localDate(commentData.date);
+            newComment.appendChild(commentDate);
+
+            let submitBtn = document.createElement('div');
+            submitBtn.textContent = 'Ответить';
+            submitBtn.className = 'addPost reply-comment';
+            submitBtn.dataset.commentId = commentData.id;
+            submitBtn.onclick = function () {
+                if (commentData.parentId != null) {
+                    createReplyForm(newComment.id, addChildrenComment);
+                }
+                else {
+                    createReplyForm(newComment.id, addChildrenToParentComment);
+                }
+            };
+            commentDate.appendChild(submitBtn);
+
+            addComment(newComment);
+        }
+
+        document.addEventListener('DOMContentLoaded', function () {
+            // Добавление слушателей события клика ко всем кнопкам ответа к родительским сообщениям
+            let replyParentButtons = document.querySelectorAll('.reply-btn');
+            replyParentButtons.forEach(function (button) {
+                button.addEventListener('click', function () {
+                    let commentId = this.dataset.commentId;
+                    createReplyForm(commentId, addChildrenToParentComment);
+                });
+            });
+
+            // Добавление слушателей события клика ко всем кнопкам ответа к дочерним сообщениям
+            let replyChildrenButtons = document.querySelectorAll('.reply-comment-btn');
+            replyChildrenButtons.forEach(function (button) {
+                button.addEventListener('click', function () {
+                    let commentId = this.dataset.commentId;
+                    createReplyForm(commentId, addChildrenComment);
+                });
+            });
+
+            // Добавление слушателя события клика к форме отправки сообщения
+            let createButton = document.querySelector('.create-form');
+            createButton.addEventListener('submit', function (event) {
+                let text = document.querySelector('textarea').value;
+                createButton.querySelector('textarea').disabled = true;
+                createButton.querySelector('button').disabled = true;
+
+                let data = {
+                    parentId: null,
+                    text: text
+                };
+
+                let formData = new FormData();
+                formData.set("Text", text);
+                formData.set("__RequestVerificationToken", document.getElementsByName("__RequestVerificationToken")[0].value);
+
+                fetch(`${location.href}/CreateComment`, {
+                    method: 'POST',
+                    body: formData,
+                })
+                    .then(response => {
+                        if (!response.ok) {
+                            throw new Error('Failed to submit reply');
+                        }
+
+                        return response.text();
+                    })
+                    .then(json => {
+
+                        let comment = JSON.parse(json);
+
+                        data.id = comment.id;
+                        data.login = comment.login;
+                        data.date = comment.date;
+                        data.text = comment.text;
+
+                        createButton.querySelector('textarea').value = null;
+                        createButton.querySelector('textarea').disabled = false;
+                        createButton.querySelector('button').disabled = false;
+                        displayComment(data, addNewParentComment);
+                    })
+                    .catch(error => {
+                        createButton.querySelector('textarea').disabled = false;
+                        createButton.querySelector('button').disabled = false;
+                        showToast("Не удалось отправить комментарий.")
+                    });
+
+                event.preventDefault();
+            });
+
+        });
+    </script>
+}
