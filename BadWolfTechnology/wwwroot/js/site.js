@@ -3,6 +3,8 @@
 
 // Write your JavaScript code.
 
+
+// Получить отформатированное время в текущем часовом поясе
 function localDate(date, spacer = "-") {
     var localDate = new Date(date);
 
@@ -14,4 +16,21 @@ function localDate(date, spacer = "-") {
         ("0" + localDate.getMinutes()).slice(-2);
 
     return formattedDate;
+}
+
+// Вывести уведомление о ошибке
+
+let timeoutShowToastMessage;
+function showToast(text) {
+    if (timeoutShowToastMessage === undefined) {
+
+        let toast = document.getElementById("snackbar");
+        toast.className = "show";
+        toast.textContent = text;
+        timeoutShowToastMessage = setTimeout(function () {
+            toast.className = "";
+            clearTimeout(timeoutShowToastMessage);
+            timeoutShowToastMessage = undefined;
+        }, 3000);
+    }
 }
