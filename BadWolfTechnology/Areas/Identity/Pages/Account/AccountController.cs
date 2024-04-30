@@ -57,9 +57,21 @@ namespace BadWolfTechnology.Areas.Identity.Pages.Account
 
                 // This doesn't count login failures towards account lockout
                 // To enable password failures to trigger account lockout, set lockoutOnFailure: true
+                var user = await _userManager.FindByEmailAsync(Input.EmailOrUserName) ?? await _userManager.FindByNameAsync(Input.EmailOrUserName);
 
-                var userName = _userManager.FindByEmailAsync(Input.EmailOrUserName).Result?.UserName ?? Input.EmailOrUserName;
-                var result = await _signInManager.PasswordSignInAsync(userName, Input.Password, Input.RememberMe, lockoutOnFailure: true);
+                if (user == null)
+                {
+                    return Json(new { error = "Неверный логин или пароль." });
+                }
+
+                var emailConfirmed = await _userManager.IsEmailConfirmedAsync(user);
+
+                if (!emailConfirmed)
+                {
+                    return Json(new { error = "Почта не подтверждена." });
+                }
+
+                var result = await _signInManager.PasswordSignInAsync(user.UserName, Input.Password, Input.RememberMe, lockoutOnFailure: true);
 
                 if (result.Succeeded)
                 {
@@ -73,15 +85,11 @@ namespace BadWolfTechnology.Areas.Identity.Pages.Account
                 if (result.IsLockedOut)
                 {
                     _logger.LogWarning("User account locked out.");
-                    return RedirectToPage("./Lockout");
+                    return Json(new { error = "Аккаунт временно заблокирован.\n Попробуйте войти позже." });
                 }
                 if (result.IsNotAllowed)
                 {
-                    return Json(new { error = "Почта не подтверждена."});
-                }
-                else
-                {
-                    return Json(new { error = "Неверный логин или пароль." });
+                    return Json(new { error = "Вход не разрешен."});
                 }
             }
 
