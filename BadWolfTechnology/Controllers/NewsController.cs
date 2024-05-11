@@ -76,16 +76,11 @@ namespace BadWolfTechnology.Controllers
         [AllowAnonymous]
         public async Task<ActionResult> Details(Guid id)
         {
-            var news = _context.News.Include(n => n.Comments).ThenInclude(comment => comment.Parent).FirstOrDefault(x => x.Id == id);
+            var news = await _context.News.Include(n => n.Comments).ThenInclude(comment => comment.User).FirstOrDefaultAsync(x => x.Id == id);
 
             if (news is null || news.IsDelete)
             {
                 return NotFound();
-            }
-
-            foreach (var comment in news.Comments)
-            {
-                _context.Entry(comment).Reference(comment => comment.User).Load();
             }
 
             return View(news);
@@ -139,6 +134,11 @@ namespace BadWolfTechnology.Controllers
         [Authorize(Roles = "Administrator, NewsManager")]
         public async Task<ActionResult> EditAsync(Guid id, [Bind] NewsEdit Input, IFormFile? image)
         {
+            if(id == default)
+            {
+                return BadRequest();
+            }
+
             this.Input = Input;
             return await SaveNewsAsync(image, id);
         }
@@ -157,6 +157,7 @@ namespace BadWolfTechnology.Controllers
             }
 
             news.IsDelete = true;
+
             foreach(var comment in news.Comments)
             {
                 comment.IsDeleted = true;
@@ -164,14 +165,7 @@ namespace BadWolfTechnology.Controllers
 
             await _context.SaveChangesAsync();
 
-            try
-            {
-                return RedirectToAction(nameof(Index));
-            }
-            catch
-            {
-                return View();
-            }
+            return RedirectToAction(nameof(Index));
         }
 
         [HttpPost]
