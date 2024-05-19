@@ -28,6 +28,7 @@
         <div class="text" style="padding:10px;">
             <div id="news-id-444" style="display:inline;">
                 <div style="text-align:center;">
+                    <div class="image-container">
                     @if (Model.ImageName != null || Model.TempImageName != null)
                     {
                         if (Model.TempImageName != null)
@@ -43,11 +44,13 @@
                     {
                         <img class="wrapper exmp" id="image-preview" src="https://placehold.co/600x350" alt="placeholder">
                     }
+                        <div class="top-right-clear" id="deleteImage" onclick="deleteImage()">✖</div>
+                    </div>
                     <br>
                     <br>
-                    <input type="text" asp-for="ImageName" class="text-input" style="display:none;" value="@Model.ImageName" />
-                    <input type="text" asp-for="TempImageName" class="text-input" style="display:none;" value="@Model.TempImageName" />
-                    <input type="file" name="image" accept=".jpg, .jpeg, .png .webp" placeholder="Загрузите изображение" onchange="updatePreview(this, 'image-preview')" />
+                    <input type="text" asp-for="ImageName" id="ModelImageName" class="text-input" style="display:none;" value="@Model.ImageName" />
+                    <input type="text" asp-for="TempImageName" id="ModelTempImageName" class="text-input" style="display:none;" value="@Model.TempImageName" />
+                    <input type="file" name="image" id="ModelFile" accept=".jpg, .jpeg, .png .webp" placeholder="Загрузите изображение" onchange="updatePreview(this, 'image-preview')" />
                     <br>
                     <span asp-validation-for="ImageName" class="text-danger"></span>
                     <span asp-validation-for="TempImageName" class="text-danger"></span>
@@ -82,6 +85,15 @@
 <script src="~/lib/quill/dist/quill.js"></script>
 <script src="~/lib/quill/dist/quill.js"></script>
 <script>
+    window.onload = function () {
+        const imageNameInput = document.getElementById('ModelImageName');
+        const tempImageNameInput = document.getElementById('ModelTempImageName');
+
+        if (tempImageNameInput.value || imageNameInput.value) {
+            document.getElementById('deleteImage').style.visibility = "visible"
+        }
+    };
+
     function updatePreview(input, target) {
         let file = input.files[0];
         let reader = new FileReader();
@@ -132,6 +144,44 @@
         }
         else {
             document.getElementById("textResult").value = divContent;
+        }
+    }
+
+    function deleteImage() {
+        const placeholder = 'https://placehold.co/600x350';
+        const imagePreview = document.getElementById('image-preview');
+        const imageNameInput = document.getElementById('ModelImageName');
+        const tempImageNameInput = document.getElementById('ModelTempImageName');
+        const tempFileInput = document.getElementById('ModelFile');
+
+        if (tempFileInput.value) {
+            //Если InputFile не пуст, очистить его и показать изображение из TempImageName или ImageName, или вывести заполнитель
+            tempFileInput.value = '';
+
+            if (tempImageNameInput.value) {
+                imagePreview.src = `/image/Temp/${tempImageNameInput.value}`;
+            } else if (imageNameInput.value) {
+                imagePreview.src = `/image/News/${imageNameInput.value}`;
+            } else {
+                imagePreview.src = placeholder;
+            }
+        } else if (tempImageNameInput.value) {
+            // Если TempImageName не пуст, очистить его и показать изображение из ImageName
+            tempImageNameInput.value = '';
+            if (imageNameInput.value) {
+                imagePreview.src = `/image/News/${imageNameInput.value}`;
+            } else {
+                imagePreview.src = placeholder;
+            }
+        } else if (imageNameInput.value) {
+            // Если TempImageName пуст, а ImageName - нет, сбросить ImageName и вывести заполнитель
+            imageNameInput.value = '';
+            imagePreview.src = placeholder;
+            document.getElementById('deleteImage').style.visibility = "hidden";
+        } else {
+            // Если TempImageName и ImageName не имеют значений, выводится заполнитель
+            imagePreview.src = placeholder;
+            document.getElementById('deleteImage').style.visibility = "hidden";
         }
     }
 </script>

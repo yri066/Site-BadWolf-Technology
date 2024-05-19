@@ -343,6 +343,10 @@ textarea:disabled {
     height: auto;
 }
 
+.wrapper.exmp.edit {
+    max-width: 558px;
+}
+
 .newsUrl {
     display: block;
     text-align: center;
@@ -804,7 +808,7 @@ button[disabled] {
 }
 
 .text-input.edit {
-    width: 600px;
+    width: -webkit-fill-available;
 }
 
 input[type="checkbox"] {
@@ -958,6 +962,123 @@ input[type='password'] {
 
 .dropbtn:checked~.dropdown-content {
     display: block;
+}
+
+/*---Редактор контента---*/
+
+.form-group {
+    flex-wrap: wrap
+}
+
+.form-group select,
+.form-group button {
+    margin: 0 2px;
+}
+
+.form-group .mb-2 {
+    margin-bottom: 10px;
+}
+
+.form-group .item {
+    background-color: #2F2D2F;
+    border-radius: 5px;
+    margin: 10px 0;
+    width: 100%;
+    padding: 10px;
+    border: 1px solid;
+}
+
+.item-select {
+    height: 27px;
+    min-width: 150px;
+    border-radius: 5px;
+}
+
+.form-input {
+    width: -webkit-fill-available;
+}
+
+.form-group .item .sub-item {
+    background-color: #212021;
+    margin-top: 10px;
+    padding: 10px;
+    border-radius: 5px;
+}
+
+/*---кнопка убрать изображение на странице редактирования---*/
+.image-container {
+    position: relative;
+    display: inline-block;
+}
+
+    .image-container img {
+        display: block;
+    }
+
+.top-right-clear {
+    visibility: hidden;
+    position: absolute;
+    top: 0;
+    right: 0;
+    margin: 10px;
+    padding: 5px;
+    width: 22px;
+    height: 22px;
+    background-color: white;
+    border: 1px solid rgba(0, 0, 0, 0.15);
+    border-radius: 100%;
+    cursor: pointer;
+    text-align: center;
+    font-size: 16px;
+    -webkit-box-shadow: 0px 0px 10px 0px rgba(34, 60, 80, 0.4);
+    -moz-box-shadow: 0px 0px 10px 0px rgba(34, 60, 80, 0.4);
+    box-shadow: 0px 0px 10px 0px rgba(34, 60, 80, 0.4);
+}
+/*---fancyapps---*/
+
+.f-carousel.is-horizontal {
+    --f-button-width: 48px;
+    --f-button-height: 48px;
+    --f-button-svg-width: 20px;
+    --f-button-svg-height: 20px;
+    --f-button-svg-stroke-width: 2.5;
+    --f-button-next-pos: -10px;
+    --f-button-prev-pos: -10px;
+}
+
+.f-carousel.is-horizontal {
+    --f-button-width: 38px;
+    --f-button-height: 38px;
+    --f-button-svg-width: 16px;
+    --f-button-svg-height: 16px;
+    --f-button-svg-stroke-width: 2.5;
+    --f-button-color: rgb(71 85 105);
+    --f-button-border: 0;
+    --f-button-border-radius: 50%;
+    --f-button-shadow: 0 6px 12px -2px rgb(50 50 93 / 25%), 0 3px 7px -3px rgb(0 0 0 / 30%);
+    --f-button-bg: #fff;
+    --f-button-hover-bg: #f9f9f9;
+    --f-button-active-bg: #f0f0f0;
+}
+
+.f-button {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    box-sizing: content-box;
+    position: relative;
+    margin: 0;
+    padding: 0;
+    width: var(--f-button-width);
+    height: var(--f-button-height);
+    border: var(--f-button-border);
+    border-radius: var(50%);
+    color: var(--f-button-color);
+    background: var(--f-button-bg);
+    box-shadow: var(--f-button-shadow);
+    pointer-events: all;
+    cursor: pointer;
+    transition: var(--f-button-transition);
 }
 
 /*---Выпадающее меню---*/
