@@ -1,35 +1,35 @@
-﻿@*
-    For more information on enabling MVC for empty projects, visit https://go.microsoft.com/fwlink/?LinkID=397860
-*@
+﻿@using Microsoft.AspNetCore.Http.Features
 @{
+    var consentFeature = Context.Features.Get<ITrackingConsentFeature>();
+    var showBanner = !consentFeature?.CanTrack ?? false;
+    var cookieString = consentFeature?.CreateConsentCookie();
 }
-@if (!Context.Request.Cookies.ContainsKey("CookiesAllow"))
+
+@if (showBanner)
 {
+    <div class="cookie_wrap" id="cookieConsent">
+        <p class="cookie_text">
+            Этот веб-сайт использует файлы cookie, чтобы вы могли максимально эффективно его использовать. <a asp-controller="Home" asp-action="Cookies">О согласии</a>.
+        </p>
+        <div class="cookie_group_button">
+            <div class="cookie_button" data-cookie-string="@cookieString">Принимаю</div>
+            <div class="cookie_close">+</div>
+        </div>
+    </div>
     <script>
-        $(document).on("click", ".cookie_button", function () {
-            $(".cookie_wrap").fadeOut("slow");
-            setCookie("CookiesAllow", 1);
-        });
+        (function () {
+            var button = document.querySelector("#cookieConsent div[data-cookie-string]");
+            button.addEventListener("click", function (event) {
+                console.log("#cookieConsent div[data-cookie-string]");
+                document.cookie = button.dataset.cookieString;
+                $(".cookie_wrap").fadeOut("slow");
+            }, false);
+        })();
 
         $(document).on("click", ".cookie_close", function () {
             $(".cookie_wrap").fadeOut("slow");
         });
-
-        function setCookie(name, value, days) {
-            var d = new Date();
-            d.setTime(d.getTime() + 60 * 60 * 24 * 365);
-            var expires = "expires=" + d.toUTCString();
-            document.cookie = name + "=" + value + ";" + expires + ";path=/";
-        }
     </script>
 
-    <div class="cookie_wrap">
-        <p class="cookie_text">
-            Этот веб-сайт использует файлы cookie, чтобы вы могли максимально эффективно его использовать. <a href="">О согласии</a>.
-        </p>
-        <div class="cookie_group_button">
-            <div class="cookie_button">Принимаю</div>
-            <div class="cookie_close">+</div>
-        </div>
-    </div>
+    
 }
