@@ -1,0 +1,116 @@
+﻿@model PaginatedList<IPublication>
+@using Microsoft.AspNetCore.Identity
+@inject SignInManager<ApplicationUser> SignInManager
+
+@{
+}
+<link href="~/lib/quill/dist/quill.snow.css" rel="stylesheet" />
+<script src="/lib/HTMLString/html-string.min.js"></script>
+@if ((await AuthorizationService.AuthorizeAsync(User, new Product(), ProductOperations.Create)).Succeeded)
+{
+    <a asp-action="Create" class="addPost"><button class="btn">Добавить продукт</button></a>
+}
+<br />
+@if (Model.Count() > 0)
+{
+    foreach (Product item in Model)
+    {
+        <div class="BoxNews">
+            <div class="newstitle">
+                <div class="text3">
+                    <a asp-action="Details" asp-route-CodePage="@item.CodePage">
+                        <h2>@item.Title</h2>
+                    </a>
+                </div>
+                @if ((await AuthorizationService.AuthorizeAsync(User, item, ProductOperations.Update)).Succeeded)
+                {
+                    <div class="addPost">
+                        <div class="dropdown">
+                            <input id="@item.Id" type="checkbox" name="menu" class="dropbtn" />
+                            <label for="@item.Id" class="droplab">···</label>
+                            <div class="dropdown-content">
+                                <a asp-action="Edit" asp-route-Id="@item.Id">Редактировать</a>
+                                @if ((await AuthorizationService.AuthorizeAsync(User, item, ProductOperations.Delete)).Succeeded)
+                                {
+                                    <form method="post" asp-action="Delete">
+                                        <input type="hidden" name="id" value="@item.Id">
+                                        <input type="submit" onclick="return confirmationDelete();" value="Удалить">
+                                    </form>
+                                }
+                            </div>
+                        </div>
+                    </div>
+                }
+            </div>
+            <div class="text" style="padding:10px;">
+                <div style="display:inline;">
+                    <div style="text-align:center;">
+                        @if (item.ImageName != null)
+                        {
+                            <a class="newsUrl" asp-action="Details" asp-route-CodePage="@item.CodePage">
+                                <img class="wrapper exmp" src="~/image/Product/@item.Id/@item.ImageName" asp-append-version="true" />
+                            </a>
+                            <br />
+                        }
+                        <div class="ql-snow">
+                            <div class="ql-editor">
+                                <div class="text-overflow-content">
+                                    @Html.Raw(item.Text)
+                                </div>
+                            </div>
+                        </div>
+                        <div class="url">
+                            <a asp-action="Details" asp-route-CodePage="@item.CodePage">Перейти на страницу</a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="newsbottom">
+                Добавлено: <font color="cccccc">
+                    <script>document.write(localDate("@item.Created.ToString("yyyy-MM-ddTHH:mmZ")"));</script>
+            </div>
+        </div>
+        <br>
+    }
+    @if (Model.HasPreviousPage || Model.HasNextPage)
+    {
+        <div class="pagination">
+            @if (Model.HasPreviousPage)
+            {
+                <a asp-action="Index" asp-route-Page="@(Model.PageIndex - 1)"><button class="btn">Предыдущая</button></a>
+            }
+            else
+            {
+                <button disabled>Предыдущая</button>
+            }
+            @if (Model.HasNextPage)
+            {
+                <a asp-action="Index" asp-route-Page="@(Model.PageIndex + 1)"><button class="btn">Следующая</button></a>
+            }
+            else
+            {
+                <button disabled>Следующая</button>
+            }
+        </div>
+    }
+}
+else
+{
+    <h1>Продуктов пока еще нет.</h1>
+}
+
+<script>
+    let items = document.querySelectorAll('.text-overflow-content');
+    items.forEach((text) => {
+        let myString = new HTMLString.String(text.innerHTML, saveWhitespace = false);
+        text.innerHTML = myString.slice(0, 750).html();
+    })
+</script>
+@if ((await AuthorizationService.AuthorizeAsync(User, null, ProductOperations.Delete)).Succeeded)
+{
+    <script>
+        function confirmationDelete() {
+            return confirm('Вы действительно хотите удалить данную статью?');
+        }
+    </script>
+}
