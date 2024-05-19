@@ -36,7 +36,8 @@ namespace BadWolfTechnology.Controllers
 
         // GET: NewsController
         [AllowAnonymous]
-        public async Task<ActionResult> Index(int Page = 1)
+        [Route("News")]
+        public async Task<ActionResult> IndexAsync(int Page = 1)
         {
             int defaultPageSize = 4;
 
@@ -83,6 +84,7 @@ namespace BadWolfTechnology.Controllers
                 return NotFound();
             }
 
+            ViewData["Title"] = news.Title;
             return View(news);
         }
 
@@ -98,7 +100,7 @@ namespace BadWolfTechnology.Controllers
         [HttpPost]
         [ValidateAntiForgeryToken]
         [Authorize(Roles = "Administrator, NewsManager")]
-        public async Task<ActionResult> Create([Bind] NewsEdit Input, IFormFile? image)
+        public async Task<ActionResult> CreateAsync([Bind] NewsEdit Input, IFormFile? image)
         {
             this.Input = Input;
             return await SaveNewsAsync(image);
@@ -149,7 +151,7 @@ namespace BadWolfTechnology.Controllers
         [Authorize(Roles = "Administrator")]
         public async Task<ActionResult> DeleteAsync(Guid id)
         {
-            var news = await _context.News.Include(news => news.Comments).FirstOrDefaultAsync(news => news.Id == id);
+            var news = await _context.News.Where(news => !news.IsDelete).Include(news => news.Comments).FirstOrDefaultAsync(news => news.Id == id);
 
             if(news == null)
             {
@@ -244,8 +246,7 @@ namespace BadWolfTechnology.Controllers
         /// <param name="image">Передаваемый файл.</param>
         /// <param name="id">Идентификатор новости при редактировании.</param>
         /// <returns></returns>
-        [NonAction]
-        public async Task<ActionResult> SaveNewsAsync(IFormFile? image, Guid id = new Guid())
+        private async Task<ActionResult> SaveNewsAsync(IFormFile? image, Guid id = new Guid())
         {
             //Сохранить изображение во временную папку.
             if (image != null)
@@ -280,9 +281,11 @@ namespace BadWolfTechnology.Controllers
                 }
             }
 
+            News? news;
+
             if (id == default)
             {
-                var news = new News()
+                news = new News()
                 {
                     Title = Input.Title,
                     ImageName = Input.ImageName,
@@ -293,12 +296,10 @@ namespace BadWolfTechnology.Controllers
 
                 await _context.AddAsync(news);
                 await _context.SaveChangesAsync();
-
-                return RedirectToAction(nameof(Details), new { news.Id });
             }
             else
             {
-                var news = await _context.News.Where(news => !news.IsDelete).FirstOrDefaultAsync(news => news.Id == id);
+                news = await _context.News.Where(news => !news.IsDelete).FirstOrDefaultAsync(news => news.Id == id);
 
                 if (news == null)
                 {
@@ -311,9 +312,9 @@ namespace BadWolfTechnology.Controllers
                 news.IsView = Input.IsView;
 
                 await _context.SaveChangesAsync();
-
-                return RedirectToAction(nameof(Details), new { news.Id });
             }
+
+            return RedirectToAction(nameof(Details), new { news.Id });
         }
     }
 }

@@ -11,7 +11,6 @@ namespace BadWolfTechnology.Data.Interfaces
         public string Text { get; set; }
         public int? CommentCount { get; set; }
         public bool IsView { get; set; }
-        public bool IsDelete { get; set; }
         public DateTime Created { get; set; }
     }
 }

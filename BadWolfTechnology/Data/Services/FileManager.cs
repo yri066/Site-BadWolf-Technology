@@ -35,7 +35,6 @@ namespace BadWolfTechnology.Data.Services
         /// <returns></returns>
         public async Task SaveFile(string path, string fileName, IFormFile file)
         {
-            Console.WriteLine("Save file");
             if (!Directory.Exists(path))
             {
                 Directory.CreateDirectory(path);
@@ -92,8 +91,15 @@ namespace BadWolfTechnology.Data.Services
         /// <exception cref="Exception">Не удалось сохранить файл.</exception>
         public void MoveImage(string sourceFolderName, string destFolderName, string fileName)
         {
+            var path = Path.Combine(Environment.CurrentDirectory, "wwwroot", "image", destFolderName);
+
+            if(!Directory.Exists(path))
+            {
+                Directory.CreateDirectory(path);
+            }
+
             var sourceFileName = Path.Combine(Environment.CurrentDirectory, "wwwroot", "image", sourceFolderName, fileName);
-            var destFileName = Path.Combine(Environment.CurrentDirectory, "wwwroot", "image", destFolderName, fileName);
+            var destFileName = Path.Combine(path, fileName);
 
             //Переместить файл.
             try

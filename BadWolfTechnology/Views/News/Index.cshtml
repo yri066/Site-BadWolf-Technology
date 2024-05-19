@@ -6,7 +6,7 @@
 }
 <link href="~/lib/quill/dist/quill.snow.css" rel="stylesheet" />
 <script src="/lib/HTMLString/html-string.min.js"></script>
-@if ((await AuthorizationService.AuthorizeAsync(User, null, NewsOperations.Create)).Succeeded)
+@if ((await AuthorizationService.AuthorizeAsync(User, new News(), NewsOperations.Create)).Succeeded)
 {
     <a asp-action="Create" class="addPost"><button class="btn">Добавить новость</button></a>
 }
