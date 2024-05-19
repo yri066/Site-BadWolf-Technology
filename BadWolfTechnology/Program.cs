@@ -6,6 +6,7 @@ using BadWolfTechnology.Data.Services;
 using BadWolfTechnology.Services;
 using Microsoft.AspNetCore.Authentication.Cookies;
 using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Identity.UI.Services;
 using Microsoft.EntityFrameworkCore;
 
@@ -31,6 +32,7 @@ namespace BadWolfTechnology
                 options.SignIn.RequireConfirmedAccount = false;
                 options.Lockout.AllowedForNewUsers = true;
             })
+                .AddRoles<IdentityRole>()
                 .AddEntityFrameworkStores<ApplicationDbContext>().AddErrorDescriber<RussianIdentityErrorDescriber>();
             builder.Services.AddControllersWithViews();
 
@@ -60,6 +62,11 @@ namespace BadWolfTechnology
 
             builder.Services.AddSingleton<IAuthorizationHandler, NewsManagerAuthorizationHandler>();
             builder.Services.AddSingleton<IAuthorizationHandler, NewsAdministratorAuthorizationHandler>();
+
+            builder.Services.AddSingleton<IAuthorizationHandler, ProductAdministratorAuthorizationHandler>();
+            builder.Services.AddSingleton<IAuthorizationHandler, ProductManagerAuthorizationHandler>();
+
+            builder.Services.AddSingleton<IAuthorizationHandler, PostAdministratorAuthorizationHandler>();
 
             var app = builder.Build();
 
