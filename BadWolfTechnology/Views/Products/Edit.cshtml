@@ -1,0 +1,245 @@
+﻿@model PostEdit
+
+@{
+}
+<style>
+    .ql-toolbar {
+        background: whitesmoke;
+        border-radius: 3px 3px 0px 0px;
+    }
+
+    .ql-editor {
+        background: white;
+        color: black;
+        min-height: 150px;
+    }
+</style>
+
+
+
+<form enctype="multipart/form-data" method="post" class="reply-form">
+    <div class="BoxNews">
+        <div class="newstitle1">
+            <div class="text3">
+                <h2>
+                    <input type="text" asp-for="Title" class="text-input edit" placeholder="Заголовок" />
+                    <span asp-validation-for="Title" class="text-danger"></span>
+                </h2>
+            </div>
+        </div>
+        <div class="text" style="padding:10px;">
+            <div id="news-id-444" style="display:inline;">
+                <div style="text-align:center;">
+                    <div class="image-container">
+                        @if ((Model.Id != null && Model.ImageName != null) || Model.TempImageName != null)
+                        {
+                            if (Model.TempImageName != null)
+                            {
+                                <img class="wrapper exmp" id="image-preview" src="~/image/Temp/@Model.TempImageName" asp-append-version="true"/>
+                            }
+                            else
+                            {
+                                <img class="wrapper exmp" id="image-preview"
+                                     src="~/image/@ViewData["ImageFolder"]/@Model.Id/@Model.ImageName" asp-append-version="true"/>
+                            }
+                        }
+                        else
+                        {
+                            <img class="wrapper exmp" id="image-preview" src="https://placehold.co/600x350"
+                                alt="placeholder">
+                        }
+                        <div class="top-right-clear" id="deleteImage" onclick="deleteImage()">✖</div>
+                    </div>
+                    <br>
+                    <br>
+                    <input type="text" asp-for="ImageName" id="ModelImageName" class="text-input" style="display:none;"
+                        value="@Model.ImageName" />
+                    <input type="text" asp-for="TempImageName" id="ModelTempImageName" class="text-input"
+                        style="display:none;" value="@Model.TempImageName" />
+                    <input type="file" name="image" id="ModelFile" accept=".jpg, .jpeg, .png .webp"
+                        placeholder="Загрузите изображение" onchange="updatePreview(this, 'image-preview')" />
+                    <br>
+                    <span asp-validation-for="ImageName" class="text-danger"></span>
+                    <span asp-validation-for="TempImageName" class="text-danger"></span>
+                    <br>
+                    <div style="text-align:justify;">
+
+                        <label asp-for="CodePage" class="form-label"></label>
+                        <br />
+                        @if ((bool?)ViewData["CodePage"] ?? true)
+                        {
+                            <input type="text" asp-for="CodePage" class="text-input edit" value="@Model.CodePage"
+                                placeholder="@Html.DisplayName("CodePage")" />
+                        }
+                        else
+                        {
+                            <input type="text" asp-for="CodePage" class="text-input edit" value="@Model.CodePage"
+                                placeholder="@Html.DisplayName("CodePage")" readonly="readonly" />
+                        }
+                        <span asp-validation-for="CodePage" class="text-danger"></span>
+                        <br>
+                        <br>
+                        <input type="text" asp-for="Text" class="text-input" id="textResult" style="display:none;"
+                            placeholder="Текст новости" />
+                        <div id="toolbar">
+                        </div>
+                        <div id="editor">
+                            @Html.Raw(Model.Text)
+                        </div>
+                        <span asp-validation-for="Text" class="text-danger"></span>
+                        <br>
+                        <br>
+                        <label asp-for="IsView" class="form-label">
+                            <input class="form-check-input" asp-for="IsView" />
+                            @Html.DisplayNameFor(m => m.IsView)
+                        </label>
+                        <br>
+                        <br>
+                        <div id="contents" class="form-group">
+                            <!-- Items will be dynamically added here -->
+                            @if (Model.Contents.Count > 0)
+                            {
+                                <partial name="/Views/Products/_EditPostContentPartial.cshtml" model="Model" />
+                            }
+                        </div>
+                        <br>
+                        <button class="btn" onclick="addBlock(); return false;">Добавить блок</button>
+                        <br>
+                        <br>
+                        <br>
+                        <input class="btn" type="submit" name="post_news" value="Опубликовать" /><br><br>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</form>
+
+<link href="~/lib/quill/dist/quill.snow.css" rel="stylesheet" />
+<script src="~/lib/quill/dist/quill.js"></script>
+<script src="~/js/PostEditor.js" asp-append-version="true"></script>
+
+<script>
+    document.addEventListener("DOMContentLoaded", function () {
+        const imageNameInput = document.getElementById('ModelImageName');
+        const tempImageNameInput = document.getElementById('ModelTempImageName');
+
+        if (tempImageNameInput.value || imageNameInput.value) {
+            document.getElementById('deleteImage').style.visibility = "visible"
+        }
+    });
+
+    /**
+    * Параметры редактора текста.
+    */
+    const toolbarOptions = [
+        ['bold', 'italic', 'underline', 'strike'],        // toggled buttons
+        ['blockquote', 'code-block'],
+        ['link', 'image', 'formula'],
+
+        [{ 'header': 1 }, { 'header': 2 }],               // custom button values
+        [{ 'list': 'ordered' }, { 'list': 'bullet' }, { 'list': 'check' }],
+        [{ 'script': 'sub' }, { 'script': 'super' }],      // superscript/subscript
+        [{ 'indent': '-1' }, { 'indent': '+1' }],          // outdent/indent
+        [{ 'direction': 'rtl' }],                         // text direction
+
+        [{ 'size': ['small', false, 'large', 'huge'] }],  // custom dropdown
+        [{ 'header': [1, 2, 3, 4, 5, 6, false] }],
+
+        [{ 'color': [] }, { 'background': [] }],          // dropdown with defaults from theme
+        [{ 'font': [] }],
+        [{ 'align': [] }],
+
+        ['clean']                                         // remove formatting button
+    ];
+
+    /**
+    * Инициализирует текстовый редактор в контейнере.
+    */
+    const quill = new Quill('#editor', {
+        modules: {
+            toolbar: toolbarOptions
+        },
+        theme: 'snow'
+    });
+
+    /**
+    * Вызывает метод при изменении текста в редакторе.
+    */
+    quill.on('text-change', (delta, oldDelta, source) => {
+        updateInput();
+    });
+
+    /**
+    * Обновляет поле ввода при изменении текста в редакторе.
+    */
+    function updateInput() {
+        var divContent = document.getElementsByClassName("ql-editor")[0].innerHTML;
+        if (divContent == "<p><br></p>") {
+            document.getElementById("textResult").value = null;
+        }
+        else {
+            document.getElementById("textResult").value = divContent;
+        }
+    }
+
+    /**
+    * Установить превью при выборе изображения.
+    * @@param {Element} input Поле выбора файла.
+    * @@param {string} id Ид превью изображения.
+    */
+    function updatePreview(input, target) {
+        let file = input.files[0];
+        let reader = new FileReader();
+
+        reader.readAsDataURL(file);
+        reader.onload = function () {
+            let img = document.getElementById(target);
+            img.src = reader.result;
+        }
+
+        document.getElementById('deleteImage').style.visibility = "visible"
+    }
+    
+    /**
+    * Отменить изменение изображения в превью.
+    */
+    function deleteImage() {
+        const placeholder = 'https://placehold.co/600x350';
+        const imagePreview = document.getElementById('image-preview');
+        const imageNameInput = document.getElementById('ModelImageName');
+        const tempImageNameInput = document.getElementById('ModelTempImageName');
+        const tempFileInput = document.getElementById('ModelFile');
+
+        if (tempFileInput.value) {
+            //Если InputFile не пуст, очистить его и показать изображение из TempImageName или ImageName, или вывести заполнитель
+            tempFileInput.value = '';
+
+            if (tempImageNameInput.value) {
+                imagePreview.src = `/image/Temp/${tempImageNameInput.value}`;
+            } else if (imageNameInput.value) {
+                imagePreview.src = `/image/@ViewData["ImageFolder"]/@Model.Id/${imageNameInput.value}`;
+            } else {
+                imagePreview.src = placeholder;
+                document.getElementById('deleteImage').style.visibility = "hidden";
+            }
+        } else if (tempImageNameInput.value) {
+            // Если TempImageName не пуст, очистить его и показать изображение из ImageName
+            tempImageNameInput.value = '';
+            if (imageNameInput.value) {
+                imagePreview.src = `/image/@ViewData["ImageFolder"]/@Model.Id/${imageNameInput.value}`;
+            } else {
+                imagePreview.src = placeholder;
+            }
+        } else if (imageNameInput.value) {
+            // Если TempImageName пуст, а ImageName - нет, сбросить ImageName и вывести заполнитель
+            imageNameInput.value = '';
+            imagePreview.src = placeholder;
+            document.getElementById('deleteImage').style.visibility = "hidden";
+        } else {
+            // Если TempImageName и ImageName не имеют значений, выводится заполнитель
+            imagePreview.src = placeholder;
+            document.getElementById('deleteImage').style.visibility = "hidden";
+        }
+    }
+</script>

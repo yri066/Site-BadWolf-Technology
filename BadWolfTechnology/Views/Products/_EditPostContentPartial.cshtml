@@ -1,0 +1,94 @@
+﻿@model PostEdit
+
+@for (int contentNumber = 0; contentNumber < Model.Contents.Count; contentNumber++)
+{
+    if (Model.Contents[contentNumber].CheckIsNull())
+    {
+        continue;
+    }
+    <div class="item">
+        <select asp-for="@Model.Contents[contentNumber].Type" asp-items="Html.GetEnumSelectList<ContentType>()" class="item-select"></select>
+        <button type="button" class="btn btn-success">Добавить элемент</button>
+        <button type="button" class="btn btn-danger">Удалить блок</button>
+        <button class="btn btn-up">↑</button>
+        <button class="btn btn-down">↓</button>
+
+        @{
+            var typeContent = Model.Contents[contentNumber].Type;
+            var content = Model.Contents[contentNumber].Items;
+            var Title = new string[] { "Заголовок", "Текст", "Изображение" };
+            var Style = new string[] { };
+
+            switch (typeContent)
+            {
+                case ContentType.Text:
+                    Style = new string[] { "block", "block", "none" };
+                    break;
+                case ContentType.Image:
+                    Style = new string[] { "none", "none", "block" };
+                    break;
+                case ContentType.Slider:
+                    Style = new string[] { "none", "none", "block" };
+                    break;
+                case ContentType.SliderWithText:
+                    Style = new string[] { "block", "block", "block" };
+                    break;
+                case ContentType.Video:
+                    Title = new string[] { "Ссылка", "Текст", "Изображение" };
+                    Style = new string[] { "block", "none", "none" };
+                    break;
+                default:
+                    Style = new string[] { "none", "none", "none" };
+                    break;
+            }
+        }
+        <div class="content-sub-item">
+            @for (var itemNumber = 0; itemNumber < content.Count; itemNumber++)
+            {
+                var item = content[itemNumber];
+                if (item.CheckIsNull())
+                {
+                    continue;
+                }
+                <div class="sub-item" data-item-number="@contentNumber.@itemNumber">
+                    <div class="mb-2" style="display: @Style[0];">
+                        <label class="form-label">@Title[0]</label>
+                        <input name="Contents[@contentNumber].Items[@itemNumber].Title" id="Title" class="text-input edit" value="@item.Title" />
+                    </div>
+                    <div class="mb-2" style="display: @Style[1];">
+                        <label class="form-label">@Title[1]</label>
+                        <input name="Contents[@contentNumber].Items[@itemNumber].Text" id="Text" class="text-input edit" style="display:none;" value="@item.Text" />
+                        <div class="editor" id="Contents[@contentNumber].Items[@itemNumber].Editor">
+                            @Html.Raw(@item.Text)
+                        </div>
+                    </div>
+                    <div class="mb-2" style="display: @Style[2];">
+                        @if ((Model.Id != null && item.ImageName != null) || item.TempImageName != null)
+                        {
+                            if (item.TempImageName != null)
+                            {
+                                <img class="wrapper exmp edit" id="image-preview" src="~/image/Temp/@Model.TempImageName" asp-append-version="true"/>
+                            }
+                            else if (item.ImageName != null)
+                            {
+                                <img class="wrapper exmp edit" id="image-preview" src="~/image/@ViewData["ImageFolder"]/@Model.Id/@item.ImageName" asp-append-version="true"/>
+                            }
+                        }
+                        else
+                        {
+                            <img class="wrapper exmp edit" id="image-preview" src="https://placehold.co/600x350" alt="placeholder">
+                        }
+                        <label class="form-label">@Title[2]</label>
+                        <input name="Contents[@contentNumber].Items[@itemNumber].ImageName" id="ImageName" class="text-input edit" style="display: none;" value="@item.ImageName" />
+                        <input name="Contents[@contentNumber].Items[@itemNumber].TempImageName" id="TempImageName" class="text-input edit" style="display: none;" value="@item.TempImageName" />
+                        <input name="Contents[@contentNumber].Items[@itemNumber].File" id="File" class="text-input edit" type="file" />
+                        <span asp-validation-for="@Model.Contents[contentNumber].Items[itemNumber].File" class="text-danger"></span>
+                    </div>
+                    <button type="button" class="btn btn-secondary">Удалить элемент</button>
+                    <button class="btn btn-up">↑</button>
+                    <button class="btn btn-down">↓</button>
+                </div>
+            }
+        </div>
+    </div>
+}
