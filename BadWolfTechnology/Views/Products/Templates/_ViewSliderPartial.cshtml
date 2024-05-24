@@ -1,0 +1,30 @@
+﻿@model (IList<ContentItem> items,int contentNumber, string folderName)
+@*
+    For more information on enabling MVC for empty projects, visit https://go.microsoft.com/fwlink/?LinkID=397860
+*@
+@{
+    var carousel = $"Carousel{Model.contentNumber}";
+}
+
+<div class="f-carousel" id="@carousel">
+    @foreach (var item in Model.items)
+    {
+        @if (item.ImageName != null)
+        {
+            <div class="f-carousel__slide" data-thumb-src="../image/@Model.folderName/@item.ImageName">
+                <img style="wrapper exmp" alt="" data-fancybox="@carousel" loading="lazy" src="~/image/@Model.folderName/@item.ImageName" />
+            </div>
+        }
+    }
+</div>
+
+<script>
+    new Carousel(document.getElementById("@carousel"), {
+        // Your custom options
+        Dots: false,
+        Thumbs: {
+            //type: "none",
+            type: "classic",
+        },
+    }, { Thumbs });
+</script>

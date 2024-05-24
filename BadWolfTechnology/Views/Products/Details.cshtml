@@ -1,0 +1,92 @@
+﻿@model Product
+@using Microsoft.AspNetCore.Identity
+@{
+}
+<link href="~/lib/quill/dist/quill.snow.css" rel="stylesheet" />
+<link href="~/lib/fancyapps/dist/fancybox.css" rel="stylesheet" />
+<link href="~/lib/fancyapps/dist/carousel/carousel.css" rel="stylesheet"></link>
+<link href="~/lib/fancyapps/dist/carousel/carousel.thumbs.css" rel="stylesheet"></link>
+<script src="~/lib/fancyapps/dist/carousel/carousel.umd.js"></script>
+<script src="~/lib/fancyapps/dist/carousel/carousel.thumbs.umd.js"></script>
+<script src="~/lib/fancyapps/dist/fancybox.umd.js"></script>
+<style>
+    img {
+        max-width: 100%;
+        height: auto;
+    }
+</style>
+
+<div class="BoxNews">
+    <div class="newstitle">
+        <div class="text3">
+            <h2>@Model.Title</h2>
+        </div>
+        @if ((await AuthorizationService.AuthorizeAsync(User, Model, ProductOperations.Update)).Succeeded)
+        {
+            <div class="addPost">
+                <div class="dropdown">
+                    <input id="@Model.Id" type="checkbox" name="menu" class="dropbtn" />
+                    <label for="@Model.Id" class="droplab">···</label>
+                    <div class="dropdown-content">
+                        <a asp-action="Edit" asp-route-Id="@Model.Id">Редактировать</a>
+                        @if ((await AuthorizationService.AuthorizeAsync(User, Model, ProductOperations.Delete)).Succeeded)
+                        {
+                            <form method="post" asp-action="Delete">
+                                <input type="hidden" name="id" value="@Model.Id">
+                                <input type="submit" onclick="return confirmationDelete();" value="Удалить">
+                            </form>
+                        }
+                    </div>
+                </div>
+            </div>
+        }
+    </div>
+
+
+    <partial name="_ViewContentPartial" model="@((Post)Model, "Product")" />
+
+    <div class="newsbottom">
+        Добавлено: <font color="cccccc">
+            <script>document.write(localDate("@Model.Created.ToString("yyyy-MM-ddTHH:mmZ")"));</script>
+        </font>
+    </div>
+</div>
+<br />
+
+@if ((await AuthorizationService.AuthorizeAsync(User, Model, ProductOperations.Delete)).Succeeded)
+{
+    <script>
+        function confirmationDelete() {
+            return confirm('Вы действительно хотите удалить данную статью?');
+        }
+    </script>
+}
+<script>
+    // Слайдеры.
+    Fancybox.bind('[data-fancybox]', {
+        Thumbs: {
+            type: "none",
+        },
+        Toolbar: {
+            display: {
+                left: ["infobar"],
+                middle: [],
+                right: ["close"],
+            },
+        }
+    });
+
+    // Изображения.
+    Fancybox.bind('[data-fancybox="image"]', {
+        Thumbs: {
+            type: "classic",
+        },
+        Toolbar: {
+            display: {
+                left: ["infobar"],
+                middle: [],
+                right: ["close"],
+            },
+        }
+    });
+</script>

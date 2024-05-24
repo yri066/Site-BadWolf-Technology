@@ -1,0 +1,60 @@
+﻿@model (Post post, string folderName)
+@*
+    For more information on enabling MVC for empty projects, visit https://go.microsoft.com/fwlink/?LinkID=397860
+*@
+@{
+    var folderName = $"{Model.folderName}/{Model.post.Id}";
+    var post = Model.post;
+}
+
+<div class="text" style="padding:10px;">
+    <div style="display:inline;">
+        @if (post.Contents.Count == 0)
+        {
+            <div style="text-align:center;">
+                @if (@post.ImageName != null)
+                {
+                    <a class="newsUrl" href="~/image/@folderName/@post.ImageName" data-fancybox>
+                        <img class="wrapper exmp" src="~/image/@folderName/@post.ImageName" />
+                    </a>
+                    <br />
+                }
+                <div class="ql-snow">
+                    <div class="ql-editor">
+                        <div class="text-content">
+                            @Html.Raw(post.Text)
+                        </div>
+                    </div>
+                </div>
+            </div>
+        }
+        else
+        {
+            @for (var contentNumber = 0; contentNumber < post.Contents.Count; contentNumber++)
+            {
+                var item = post.Contents[contentNumber];
+
+                switch (item.Type)
+                {
+                    case ContentType.Text:
+                        <partial name="/Views/Products/Templates/_ViewTextPartial.cshtml" model="(item.Items, contentNumber, folderName)" />
+                        break;
+                    case ContentType.Image:
+                        <partial name="/Views/Products/Templates/_ViewImagePartial.cshtml" model="(item.Items, contentNumber, folderName)" />
+                        break;
+                    case ContentType.Slider:
+                        <partial name="/Views/Products/Templates/_ViewSliderPartial.cshtml" model="(item.Items, contentNumber, folderName)" />
+                        break;
+                    case ContentType.SliderWithText:
+                        <partial name="/Views/Products/Templates/_ViewSliderWithTextPartial.cshtml" model="(item.Items, contentNumber, folderName)" />
+                        break;
+                    case ContentType.Video:
+                        <partial name="/Views/Products/Templates/_ViewVideoPartial.cshtml" model="(item.Items, contentNumber, folderName)" />
+                        break;
+                    default:
+                        break;
+                }
+            }
+        }
+    </div>
+</div>
