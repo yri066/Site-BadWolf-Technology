@@ -1,8 +1,47 @@
-﻿@{
-    ViewData["Title"] = "Home Page";
+﻿@model Post
+@using Microsoft.AspNetCore.Identity
+@{
+    Layout = ViewData["Layout"]?.ToString() ?? "_Layout";
 }
+<link href="~/lib/quill/dist/quill.snow.css" rel="stylesheet" />
+<link href="~/lib/fancyapps/dist/fancybox.css" rel="stylesheet" />
+<link href="~/lib/fancyapps/dist/carousel/carousel.css" rel="stylesheet"></link>
+<link href="~/lib/fancyapps/dist/carousel/carousel.thumbs.css" rel="stylesheet"></link>
+<script src="~/lib/fancyapps/dist/carousel/carousel.umd.js"></script>
+<script src="~/lib/fancyapps/dist/carousel/carousel.thumbs.umd.js"></script>
+<script src="~/lib/fancyapps/dist/fancybox.umd.js"></script>
+<style>
+    img {
+        max-width: 100%;
+        height: auto;
+    }
+</style>
 
-<div class="text-center">
-    <h1 class="display-4">Welcome</h1>
-    <p>Learn about <a href="https://docs.microsoft.com/aspnet/core">building Web apps with ASP.NET Core</a>.</p>
+<div class="BoxNews">
+    @if ((await AuthorizationService.AuthorizeAsync(User, Model, PostOperations.Update)).Succeeded)
+    {
+        <div class="newstitle">
+            <div class="text3">
+                <h2>@Model.Title</h2>
+            </div>
+            <div class="addPost">
+                <div class="dropdown">
+                    <input id="@Model.Id" type="checkbox" name="menu" class="dropbtn" />
+                    <label for="@Model.Id" class="droplab">···</label>
+                    <div class="dropdown-content">
+                        <a asp-action="Edit" asp-route-Id="@Model.Id">Редактировать</a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    }
+
+    <partial name="/Views/Products/_ViewContentPartial.cshtml" model="@(Model, "Post")" />
+
 </div>
+<br />
+
+<script>
+    Fancybox.bind('[data-fancybox]', {});
+    Fancybox.bind('[data-fancybox="image"]', {});
+</script>
