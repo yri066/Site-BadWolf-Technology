@@ -1,0 +1,40 @@
+﻿@model List<Post>
+
+<h1>Панель администратора</h1>
+
+<div>
+    <div class="row">
+        <div class="col-md-3">
+            <ul class="nav nav-pills flex-column">
+                <li class="nav-item"><a asp-area="Admin" asp-controller="Panel" asp-action="Index" class="nav-link active" id="content" aria-current="page">Контент</a></li>
+                <li class="nav-item"><a asp-area="Admin" asp-controller="Panel" asp-action="Users" class="nav-link" id="users">Пользователи</a></li>
+                <li class="nav-item"><a asp-area="Admin" asp-controller="Panel" asp-action="Comments" class="nav-link" id="comments">Комментарии</a></li>
+                <li class="nav-item"><a asp-area="Admin" asp-controller="Panel" asp-action="RolesUsers" class="nav-link" id="rolesUsers">Пользователи с ролями</a></li>
+                <li class="nav-item"><a asp-area="Admin" asp-controller="Panel" asp-action="BannedUsers" class="nav-link" id="users">Заблокированные пользователи</a></li>
+            </ul>
+
+        </div>
+        <div class="col-md-9">
+
+            <h3>Управление контентом</h3>
+
+
+            <div class="row">
+                <div class="col-md-6">
+                    @foreach (var item in Model)
+                    {
+                        <div class="comment-text-more">
+                            @item.Title
+                            <div class="addPost reply-comment reply-btn" data-comment-id="@item.Id">
+                                <a asp-area="" asp-controller="Home" asp-action="Edit" asp-route-Id="@item.Id">Редактировать</a>
+                            </div>
+                        </div>
+                        <br />
+                    }
+                </div>
+            </div>
+
+
+        </div>
+    </div>
+</div>

@@ -59,7 +59,12 @@
     margin-bottom: 0;
     list-style: none;
     justify-content: left;
+    flex-wrap: wrap;
     padding: 10px 0px;
+}
+
+.nav-item {
+    margin: 7px 0;
 }
 
 .nav-pills .nav-link {
@@ -67,6 +72,7 @@
     color: #333;
     border-radius: 0.25rem;
     background-color: #E6E6E6;
+    white-space: nowrap;
 }
 
 .nav-pills .nav-link.active {
