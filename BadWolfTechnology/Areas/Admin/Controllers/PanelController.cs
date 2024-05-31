@@ -48,5 +48,35 @@ namespace BadWolfTechnology.Areas.Admin.Controllers
 
             return View(posts);
         }
+
+        /// <summary>
+        /// Список пользователей.
+        /// </summary>
+        /// <param name="Page">Номер страницы.</param>
+        /// <returns>Страница списка пользователей.</returns>
+        public async Task<ActionResult> UsersAsync(int Page = 1)
+        {
+            var defaultPageSize = 10;
+
+            if (Page < 1)
+            {
+                Page = 1;
+            }
+
+            var source = _context.Users.Select(user => new ApplicationUser
+            {
+                Id = user.Id,
+                UserName = user.UserName,
+            }).AsNoTracking();
+
+            var pagination = await PaginatedList<ApplicationUser>.CreateAsync(source, Page, defaultPageSize);
+
+            if (pagination.TotalPages < (Page - 1))
+            {
+                return NotFound();
+            }
+
+            return View(pagination);
+        }
     }
 }

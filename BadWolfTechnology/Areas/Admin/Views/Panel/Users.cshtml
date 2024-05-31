@@ -1,0 +1,58 @@
+﻿@model PaginatedList<ApplicationUser>
+
+<h1>Панель администратора</h1>
+
+<div>
+    <div class="row">
+        <div class="col-md-3">
+            <ul class="nav nav-pills flex-column">
+                <li class="nav-item"><a asp-area="Admin" asp-controller="Panel" asp-action="Index" class="nav-link" id="content" aria-current="page">Контент</a></li>
+                <li class="nav-item"><a asp-area="Admin" asp-controller="Panel" asp-action="Users" class="nav-link active" id="users">Пользователи</a></li>
+                <li class="nav-item"><a asp-area="Admin" asp-controller="Panel" asp-action="Comments" class="nav-link" id="comments">Комментарии</a></li>
+                <li class="nav-item"><a asp-area="Admin" asp-controller="Panel" asp-action="RolesUsers" class="nav-link" id="rolesUsers">Пользователи с ролями</a></li>
+                <li class="nav-item"><a asp-area="Admin" asp-controller="Panel" asp-action="BannedUsers" class="nav-link" id="users">Заблокированные пользователи</a></li>
+            </ul>
+
+        </div>
+        <div class="col-md-9">
+
+            <h3>Список пользователей</h3>
+
+
+            <div class="row">
+                <div class="col-md-6">
+                    @foreach (var item in Model)
+                    {
+                        <a asp-controller="Panel" asp-action="Profile" asp-route-Id="@item.Id">
+                            <div class="comment BoxNews comment-text">
+                                <label class="form-label">@item.UserName</label>
+                            </div>
+                        </a>
+                    }
+                </div>
+            </div>
+            <br />
+            @if (Model.HasPreviousPage || Model.HasNextPage)
+            {
+                <div class="pagination">
+                    @if (Model.HasPreviousPage)
+                    {
+                        <a asp-action="Users" asp-route-Page="@(Model.PageIndex - 1)"><button class="btn">Предыдущая</button></a>
+                    }
+                    else
+                    {
+                        <button disabled>Предыдущая</button>
+                    }
+                    @if (Model.HasNextPage)
+                    {
+                        <a asp-action="Users" asp-route-Page="@(Model.PageIndex + 1)"><button class="btn">Следующая</button></a>
+                    }
+                    else
+                    {
+                        <button disabled>Следующая</button>
+                    }
+                </div>
+            }
+        </div>
+    </div>
+</div>
