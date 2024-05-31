@@ -140,5 +140,36 @@ namespace BadWolfTechnology.Areas.Admin.Controllers
 
             return View(pagination);
         }
+
+        /// <summary>
+        /// Список пользователей с ролями.
+        /// </summary>
+        /// <param name="Page">Номер страницы.</param>
+        /// <returns>Страница списка пользователей с ролями.</returns>
+        public async Task<ActionResult> RolesUsers(int Page = 1)
+        {
+            var defaultPageSize = 10;
+
+            if (Page < 1)
+            {
+                Page = 1;
+            }
+
+            // Получить пользователей имеющие роли.
+            var source = (from userRole in _context.UserRoles.OrderBy(user => user.UserId)
+                          join user in _context.Users
+                            on userRole.UserId equals user.Id
+                          select new ApplicationUser
+                          {
+                              Id = user.Id,
+                              UserName = user.UserName,
+                          })
+                         .Distinct()
+                         .AsNoTracking();
+
+            var pagination = await PaginatedList<ApplicationUser>.CreateAsync(source, Page, defaultPageSize);
+
+            return View(pagination);
+        }
     }
 }
