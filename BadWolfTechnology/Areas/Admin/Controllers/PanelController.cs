@@ -78,5 +78,36 @@ namespace BadWolfTechnology.Areas.Admin.Controllers
 
             return View(pagination);
         }
+
+        /// <summary>
+        /// Заблокированные пользователи
+        /// </summary>
+        /// <param name="Page">Номер страницы.</param>
+        /// <returns>Страница заблокированных пользователей.</returns>
+        public async Task<ActionResult> BannedUsersAsync(int Page = 1)
+        {
+            var defaultPageSize = 10;
+
+            if (Page < 1)
+            {
+                Page = 1;
+            }
+
+            var source = _context.Users.Select(user => new ApplicationUser
+            {
+                Id = user.Id,
+                UserName = user.UserName,
+                LockoutEnd = user.LockoutEnd,
+            }).Where(user => user.LockoutEnd > DateTime.UtcNow).AsNoTracking();
+
+            var pagination = await PaginatedList<ApplicationUser>.CreateAsync(source, Page, defaultPageSize);
+
+            if (pagination.TotalPages < (Page - 1))
+            {
+                return NotFound();
+            }
+
+            return View(pagination);
+        }
     }
 }
