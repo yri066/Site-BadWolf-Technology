@@ -109,5 +109,36 @@ namespace BadWolfTechnology.Areas.Admin.Controllers
 
             return View(pagination);
         }
+
+        /// <summary>
+        /// Список комментариев.
+        /// </summary>
+        /// <param name="Page">Номер страницы.</param>
+        /// <returns>Страница комментариев.</returns>
+        public async Task<ActionResult> CommentsAsync(int Page = 1)
+        {
+            var defaultPageSize = 10;
+
+            if (Page < 1)
+            {
+                Page = 1;
+            }
+
+            var source = _context.Comments
+                .Include(comment => comment.User)
+                .Include(comment => comment.News)
+                .Where(comment => !comment.IsDeleted)
+                .OrderByDescending(comment => comment.Id)
+                .AsNoTracking();
+
+            var pagination = await PaginatedList<Comment>.CreateAsync(source, Page, defaultPageSize);
+
+            if (pagination.TotalPages < (Page - 1))
+            {
+                return NotFound();
+            }
+
+            return View(pagination);
+        }
     }
 }

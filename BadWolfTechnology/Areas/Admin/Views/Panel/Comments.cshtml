@@ -1,0 +1,74 @@
+﻿@model PaginatedList<Comment>
+
+<h1>Панель администратора</h1>
+
+<div>
+    <div class="row">
+        <div class="col-md-3">
+            <ul class="nav nav-pills flex-column">
+                <li class="nav-item"><a asp-area="Admin" asp-controller="Panel" asp-action="Index" class="nav-link" id="content" aria-current="page">Контент</a></li>
+                <li class="nav-item"><a asp-area="Admin" asp-controller="Panel" asp-action="Users" class="nav-link" id="users">Пользователи</a></li>
+                <li class="nav-item"><a asp-area="Admin" asp-controller="Panel" asp-action="Comments" class="nav-link active" id="comments">Комментарии</a></li>
+                <li class="nav-item"><a asp-area="Admin" asp-controller="Panel" asp-action="RolesUsers" class="nav-link" id="rolesUsers">Пользователи с ролями</a></li>
+                <li class="nav-item"><a asp-area="Admin" asp-controller="Panel" asp-action="BannedUsers" class="nav-link" id="users">Заблокированные пользователи</a></li>
+            </ul>
+
+        </div>
+        <div class="col-md-9">
+
+            <h3>Комментарии</h3>
+
+
+            <div class="row">
+                <div class="col-md-6">
+                    @foreach (var item in Model)
+                    {
+                        @if (item.IsDeleted)
+                        {
+                            <div class="comment BoxNews comment-text">
+                                <div class="text comment-text-content">Комментарий был удален.</div>
+                            </div>
+                        }
+                        else
+                        {
+                            <div class="comment BoxNews comment-text" id="@item.Id">
+                                <div class="comment-text-title">
+                                    <a asp-controller="Panel" asp-action="Profile" asp-route-Id="@item.User.Id">@item.User.UserName</a>
+                                </div>
+                                <div class="text comment-text-content">@item.Text</div>
+                                <div class="comment-text-more">
+                                    <script>document.write(localDate("@item.Created.ToString("yyyy-MM-ddTHH:mm:00Z")", "."));</script>
+                                    <div class="addPost reply-comment reply-btn" data-comment-id="@item.Id">
+                                        <a asp-area="" asp-controller="News" asp-action="Details" asp-route-Id="@item.News.Id" asp-fragment="@item.Id" target="_blank">Перейти к комментарию</a>
+                                    </div>
+                                </div>
+                            </div>
+                        }
+                    }
+                </div>
+            </div>
+            <br />
+            @if (Model.HasPreviousPage || Model.HasNextPage)
+            {
+                <div class="pagination">
+                    @if (Model.HasPreviousPage)
+                    {
+                        <a asp-action="Comments" asp-route-Page="@(Model.PageIndex - 1)"><button class="btn">Предыдущая</button></a>
+                    }
+                    else
+                    {
+                        <button disabled>Предыдущая</button>
+                    }
+                    @if (Model.HasNextPage)
+                    {
+                        <a asp-action="Comments" asp-route-Page="@(Model.PageIndex + 1)"><button class="btn">Следующая</button></a>
+                    }
+                    else
+                    {
+                        <button disabled>Следующая</button>
+                    }
+                </div>
+            }
+        </div>
+    </div>
+</div>
