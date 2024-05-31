@@ -1,0 +1,88 @@
+﻿@model (ApplicationUser user, List<IdentityRole> roles, List<string> userRoles)
+@using BadWolfTechnology.Authorization.Admin
+@using Microsoft.AspNetCore.Identity
+@inject UserManager<ApplicationUser> UserManager
+@{
+    var user = Model.user;
+    var userRoles = Model.userRoles.ToList();
+    var allRoles = Model.roles;
+}
+
+<h1>Панель администратора</h1>
+
+<div>
+    <div class="row">
+        <div class="col-md-3">
+            <ul class="nav nav-pills flex-column">
+                <li class="nav-item"><a asp-area="Admin" asp-controller="Panel" asp-action="Index" class="nav-link" id="content" aria-current="page">Контент</a></li>
+                <li class="nav-item"><a asp-area="Admin" asp-controller="Panel" asp-action="Users" class="nav-link" id="users">Пользователи</a></li>
+                <li class="nav-item"><a asp-area="Admin" asp-controller="Panel" asp-action="Comments" class="nav-link" id="comments">Комментарии</a></li>
+                <li class="nav-item"><a asp-area="Admin" asp-controller="Panel" asp-action="RolesUsers" class="nav-link" id="rolesUsers">Пользователи с ролями</a></li>
+                <li class="nav-item"><a asp-area="Admin" asp-controller="Panel" asp-action="BannedUsers" class="nav-link" id="users">Заблокированные пользователи</a></li>
+            </ul>
+        </div>
+        <div class="col-md-9">
+
+            <h3>Пользователь: @user.UserName</h3>
+            <div class="comment-text-more">ФИО: @user.FirstName @user.LastName</div>
+            <br />
+            <div class="comment-text-more">Email: @user.Email</div>
+            <br />
+            <div class="comment-text-more">
+                Статус Email: @((user.EmailConfirmed) ? "Почта подтверждена" : "Почта не подтверждена")
+            </div>
+            <br />
+            <div class="comment-text-more">Дата рождения: @user.BirthDate.ToString("dd-MM-yyyy")</div>
+            <br />
+            <div>
+                @if ((await AuthorizationService.AuthorizeAsync(User, user, AdminOperations.UpdateRole)).Succeeded)
+                {
+                    <form asp-action="UpdateUserRoles" asp-route-Id="@user.Id" method="post">
+                        @foreach (var role in allRoles)
+                        {
+                            <div>
+                                <label class="reply-comment">
+                                    <input type="checkbox" name="roles" value="@role.Name"
+                                    @(userRoles.Contains(role.Name) ? "checked=\"checked\"" : "") />@role.Name
+                                </label>
+                            </div>
+                            <br />
+                        }
+                        <button type="submit" class="btn">Сохранить</button>
+                    </form>
+                }
+                else
+                {
+                    @foreach (var role in allRoles)
+                    {
+                        <div>
+                            <label class="reply-comment">
+                                <input type="checkbox" class="readonly" name="roles" value="@role.Name"
+                                @(userRoles.Contains(role.Name) ? "checked=\"checked\"" : "") onclick="return false" />@role.Name
+                            </label>
+                        </div>
+                        <br />
+                    }
+                }
+                <br />
+                @if ((await AuthorizationService.AuthorizeAsync(User, user, AdminOperations.Ban)).Succeeded)
+                {
+                    @if (user.LockoutEnd is null || user?.LockoutEnd < DateTime.UtcNow)
+                    {
+                        <form method="post" asp-action="BanUser">
+                            <input type="hidden" name="id" value="@user.Id">
+                            <button type="submit" class="btn">Забанить</button>
+                        </form>
+                    }
+                    else
+                    {
+                        <form method="post" asp-action="UnbanningUser">
+                            <input type="hidden" name="id" value="@user.Id">
+                            <button type="submit" class="btn">Разбанить</button>
+                        </form>
+                    }
+                }
+            </div>
+        </div>
+    </div>
+</div>

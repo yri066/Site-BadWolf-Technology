@@ -1,5 +1,6 @@
 using AspNetCore.ReCaptcha;
 using BadWolfTechnology.Areas.Identity.Data;
+using BadWolfTechnology.Authorization.Admin;
 using BadWolfTechnology.Data;
 using BadWolfTechnology.Data.Interfaces;
 using BadWolfTechnology.Data.Services;
@@ -38,7 +39,7 @@ namespace BadWolfTechnology
 
             builder.Services.ConfigureApplicationCookie(options =>
             {
-                options.AccessDeniedPath = new PathString("/Account/AccessDenied");
+                options.AccessDeniedPath = new PathString("/Identity/Account/AccessDenied");
                 options.Cookie.HttpOnly = true;
                 options.LoginPath = new PathString("/Index");
                 options.ReturnUrlParameter = CookieAuthenticationDefaults.ReturnUrlParameter;
@@ -50,6 +51,8 @@ namespace BadWolfTechnology
                 options.CheckConsentNeeded = context => true;
                 options.MinimumSameSitePolicy = SameSiteMode.Lax;
             });
+
+            builder.Services.Configure<SecurityStampValidatorOptions>(o => o.ValidationInterval = TimeSpan.FromMinutes(1));
 
             builder.Services.AddReCaptcha(builder.Configuration.GetSection("ReCaptcha"));
             builder.Services.AddSingleton<IEmailConfiguration>(emailConfig);
@@ -67,6 +70,9 @@ namespace BadWolfTechnology
             builder.Services.AddSingleton<IAuthorizationHandler, ProductManagerAuthorizationHandler>();
 
             builder.Services.AddSingleton<IAuthorizationHandler, PostAdministratorAuthorizationHandler>();
+
+            builder.Services.AddScoped<IAuthorizationHandler, AdminAdministratorAuthorizationHandler>();
+            builder.Services.AddScoped<IAuthorizationHandler, AdminSuperAdministratorAuthorizationHandler>();
 
             var app = builder.Build();
 
@@ -91,9 +97,18 @@ namespace BadWolfTechnology
             app.UseAuthentication();
             app.UseAuthorization();
 
-            app.MapControllerRoute(
-                name: "default",
-                pattern: "{controller=Home}/{action=Index}/{id?}");
+            app.UseEndpoints(endpoints =>
+            {
+                endpoints.MapAreaControllerRoute(
+                    name: "admin_area",
+                    areaName: "Admin",
+                    pattern: "Admin/{controller=Home}/{action=Index}/{id?}");
+
+                endpoints.MapControllerRoute(
+                    name: "default",
+                    pattern: "{controller=Home}/{action=Index}/{id?}");
+            });
+
             app.MapRazorPages();
 
             app.Run();

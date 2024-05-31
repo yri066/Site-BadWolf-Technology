@@ -171,5 +171,145 @@ namespace BadWolfTechnology.Areas.Admin.Controllers
 
             return View(pagination);
         }
+
+        /// <summary>
+        /// Профиль пользователя.
+        /// </summary>
+        /// <param name="id">Ид пользователя.</param>
+        /// <returns>Страница профиля.</returns>
+        public async Task<ActionResult> Profile(Guid id)
+        {
+            var user = await _context.Users.AsNoTracking().FirstOrDefaultAsync(user => user.Id == id.ToString());
+
+            if (user == null)
+            {
+                return NotFound();
+            }
+
+            var userRoles = await _userManager.GetRolesAsync(user);
+            var rolesList = await _roleManager.Roles.ToListAsync();
+            rolesList.RemoveAll(role => role.Name == SuperAdminRole);
+
+            return View((user, rolesList, userRoles.ToList()));
+        }
+
+        /// <summary>
+        /// Обновляет роли пользователя.
+        /// </summary>
+        /// <param name="id">Ид пользователя.</param>
+        /// <param name="roles">Список назначенных ролей.</param>
+        /// <returns>Страница профиля.</returns>
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        public async Task<ActionResult> UpdateUserRolesAsync(Guid id, List<string> roles)
+        {
+            var user = await _userManager.FindByIdAsync(id.ToString());
+
+            if (user == null)
+            {
+                return NotFound();
+            }
+
+            var isAuthorized = await _authorizationService.AuthorizeAsync(User, user, AdminOperations.UpdateRole);
+
+            if (!isAuthorized.Succeeded)
+            {
+                return Forbid();
+            }
+
+            // Исключается роль SuperAdministrator
+            roles.RemoveAll(role => role == SuperAdminRole);
+
+            // получаем список ролей пользователя
+            var userRoles = (await _userManager.GetRolesAsync(user)).ToList();
+            userRoles.RemoveAll(role => role == SuperAdminRole);
+
+            // получаем все роли
+            var allRoles = _roleManager.Roles.ToList();
+            allRoles.RemoveAll(role => role.Name == SuperAdminRole);
+
+            // получаем список ролей, которые были добавлены
+            var addedRoles = roles.Except(userRoles);
+
+            // получаем роли, которые были удалены
+            var removedRoles = userRoles.Except(roles);
+
+            await _userManager.AddToRolesAsync(user, addedRoles);
+            await _userManager.RemoveFromRolesAsync(user, removedRoles);
+            await _userManager.UpdateSecurityStampAsync(user);
+
+            return RedirectToAction("Profile", new { id });
+        }
+
+        /// <summary>
+        /// Блокирует пользователя.
+        /// </summary>
+        /// <param name="id">Ид пользователя.</param>
+        /// <returns>Страница профиля.</returns>
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        public async Task<ActionResult> BanUserAsync(Guid id)
+        {
+            var banLengthYears = 100;
+            var user = await _userManager.FindByIdAsync(id.ToString());
+
+            if (user == null)
+            {
+                return NotFound();
+            }
+
+            var isAuthorized = await _authorizationService.AuthorizeAsync(User, user, AdminOperations.Ban);
+
+            if (!isAuthorized.Succeeded)
+            {
+                return Forbid();
+            }
+
+            var endBanDate = DateTime.UtcNow.AddYears(banLengthYears);
+            await ChangeUserBanAsync(user, endBanDate);
+
+            return RedirectToAction("Profile", new { id });
+        }
+
+        /// <summary>
+        /// Снимает блокировку с пользователя.
+        /// </summary>
+        /// <param name="id">Ид пользователя.</param>
+        /// <returns>Страница профиля.</returns>
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        public async Task<ActionResult> UnbanningUserAsync(Guid id)
+        {
+            var user = await _userManager.FindByIdAsync(id.ToString());
+
+            if (user == null)
+            {
+                return NotFound();
+            }
+
+            var isAuthorized = await _authorizationService.AuthorizeAsync(User, user, AdminOperations.Ban);
+
+            if (!isAuthorized.Succeeded)
+            {
+                return Forbid();
+            }
+
+            await ChangeUserBanAsync(user, null);
+
+            return RedirectToAction("Profile", new { id });
+        }
+
+        /// <summary>
+        /// Обновляет дату окончания блокировки.
+        /// </summary>
+        /// <param name="user">Пользователь.</param>
+        /// <param name="endBanDate">Дата окончания блокировки.</param>
+        private async Task ChangeUserBanAsync(ApplicationUser user,DateTime? endBanDate)
+        {
+            user.LockoutEnd = endBanDate;
+
+            await _userManager.UpdateAsync(user);
+            await _userManager.UpdateSecurityStampAsync(user);
+        }
     }
 }
