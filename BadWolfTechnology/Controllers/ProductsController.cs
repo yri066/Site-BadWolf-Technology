@@ -157,8 +157,16 @@ namespace BadWolfTechnology.Controllers
 
             Product? product;
 
+            var codes = await _context.CodePages.FirstOrDefaultAsync(code => code.CodePage == InputModel.CodePage);
+
             if (id == default)
             {
+                if(codes != null)
+                {
+                    ModelState.AddModelError(nameof(InputModel.CodePage), "Данный код страницы уже занят.");
+                    return View("Edit", InputModel);
+                }
+
                 product = new Product()
                 {
                     CodePage = InputModel.CodePage,
@@ -176,6 +184,14 @@ namespace BadWolfTechnology.Controllers
                 if (product == null)
                 {
                     return NotFound();
+                }
+                Console.WriteLine(codes?.Id);
+                Console.WriteLine(codes?.CodePage);
+
+                if (codes != null && codes.Id != id)
+                {
+                    ModelState.AddModelError(nameof(InputModel.CodePage), "Код страницы занят другим продуктом.");
+                    return View("Edit", InputModel);
                 }
 
                 InputModel.PostUpdate(product);

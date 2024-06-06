@@ -20,6 +20,8 @@ namespace BadWolfTechnology.Data
         public DbSet<Post> Posts { get; set; }
         public DbSet<Product> Products { get; set; }
 
+        public DbSet<PostCodePages> CodePages { get; set; }
+
         protected override void OnModelCreating(ModelBuilder builder)
         {
             base.OnModelCreating(builder);
@@ -68,6 +70,11 @@ namespace BadWolfTechnology.Data
             {
                 x.Property(b => b.Text)
                     .HasMaxLength(500);
+            });
+
+            builder.Entity<PostCodePages>(x =>
+            {
+                x.ToView("View_PostCodePages");
             });
 
             builder.Entity<IdentityRole>().HasData(new IdentityRole
