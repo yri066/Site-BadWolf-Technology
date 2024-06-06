@@ -33,9 +33,6 @@ body {
     box-sizing: inherit;
 }
 
-div {
-    display: block;
-}
 
 .header__image {
     display: block;

@@ -1,16 +1,70 @@
 ﻿@model PaginatedList<IPublication>
+@using BadWolfTechnology.Controllers
 @using Microsoft.AspNetCore.Identity
 @inject SignInManager<ApplicationUser> SignInManager
 
 @{
 }
 <link href="~/lib/quill/dist/quill.snow.css" rel="stylesheet" />
-<script src="/lib/HTMLString/html-string.min.js"></script>
+<link href="~/lib/daterangepicker/daterangepicker.css" rel="stylesheet" />
+<script src="~/lib/HTMLString/html-string.min.js"></script>
+<script src="~/lib/daterangepicker/moment.min.js"></script>
+<script src="~/lib/daterangepicker/daterangepicker.js"></script>
+<script src="~/js/NewsFiltersSort.js" defer></script>
 @if ((await AuthorizationService.AuthorizeAsync(User, new News(), NewsOperations.Create)).Succeeded)
 {
     <a asp-action="Create" class="addPost"><button class="btn">Добавить новость</button></a>
 }
 <br />
+<!--Поиск-->
+<div>
+    @using (Html.BeginForm("Index", "News", FormMethod.Get, new { novalidate = "" }))
+    {
+        @Html.TextBox("SearchString", null, new { @class = "text-input edit", id = "searchString", autocomplete = "off", placeholder = "Поиск", required = "required" })
+        <button class="close-icon" type="button" onclick="document.getElementById('searchString').value = ''"></button>
+    }
+</div>
+<br />
+<!--Фильтрация-->
+<div class="BoxNews comment-text">
+    <div class="filters">
+        <div>Сортировка: <span><button class="sort-popover reply-comment" id="popover-button">@NewsController.SortItems.First(sort => sort.Value == ViewBag.CurrentSort).Label</button></span></div>
+        <div id="sort-popover">
+            <div>
+                @foreach (var option in NewsController.SortItems)
+                {
+                    <div class="sort-popover-content reply-comment">
+                        <label>
+                            <a asp-action="Index" asp-route-SortOrder="@option.Value" asp-route-SearchString="@ViewBag.SearchString"
+                               asp-route-startDate="@ViewBag.startDate" asp-route-endDate="@ViewBag.endDate" class="sort-popover-text">
+                                @Html.RadioButton("SortOrder", option.Value, option.Value == ViewBag.CurrentSort, null)
+                                @option.Label
+                            </a>
+                        </label>
+                    </div>
+                }
+            </div>
+        </div>
+        @using (Html.BeginForm("Index", "News", new { SortOrder = ViewBag.CurrentSort, SearchString = ViewBag.SearchString }, FormMethod.Get, false, new { id="dateSortForm", novalidate = "" }))
+        {
+            <button type="button" class="filter-date sort-popover reply-comment" name="datefilter" onclick="false;">
+                @(@ViewBag.startDate is null ? "За все время" : $"{ViewBag.startDate.ToString("dd-MM-yyyy")} - {ViewBag.endDate.ToString("dd-MM-yyyy")}")
+            </button>
+            @Html.TextBox("startDate", null, new { type = "hidden" })
+            @Html.TextBox("endDate", null, new { type = "hidden" })
+            @Html.TextBox("SortOrder", ViewBag.CurrentSort, "", new { type = "hidden" })
+            @Html.TextBox("SearchString", ViewBag.SearchString, "", new { type = "hidden" })
+        }
+        @if (ViewBag.SearchString is not null ||
+             ViewBag.CurrentSort != "" ||
+             ViewBag.startDate is not null)
+        {
+            <a asp-action="index" class="filter-date">Очистить фильтры</a>
+        }
+    </div>
+</div>
+<br />
+<!--Список новостей-->
 @if (Model.Count() > 0)
 {
     foreach (News item in Model)
@@ -73,12 +127,14 @@
         </div>
         <br>
     }
+
     @if (Model.HasPreviousPage || Model.HasNextPage)
     {
         <div class="pagination">
             @if (Model.HasPreviousPage)
             {
-                <a asp-action="Index" asp-route-Page="@(Model.PageIndex - 1)"><button class="btn">Предыдущая</button></a>
+                <a asp-action="Index" asp-route-Page="@(Model.PageIndex - 1)" asp-route-SortOrder="@ViewBag.CurrentSort" asp-route-SearchString="@ViewBag.SearchString"
+                   asp-route-startDate="@ViewBag.startDate" asp-route-endDate="@ViewBag.endDate"><button class="btn">Предыдущая</button></a>
             }
             else
             {
@@ -86,7 +142,8 @@
             }
             @if (Model.HasNextPage)
             {
-                <a asp-action="Index" asp-route-Page="@(Model.PageIndex + 1)"><button class="btn">Следующая</button></a>
+                <a asp-action="Index" asp-route-Page="@(Model.PageIndex + 1)" asp-route-SortOrder="@ViewBag.CurrentSort" asp-route-SearchString="@ViewBag.SearchString"
+                   asp-route-startDate="@ViewBag.startDate" asp-route-endDate="@ViewBag.endDate"><button class="btn">Следующая</button></a>
             }
             else
             {
@@ -97,7 +154,14 @@
 }
 else
 {
-    <h1>Новостей пока еще нет.</h1>
+    @if (ViewBag.SearchString is not null)
+    {
+        <h1>Нет результатов поиска.</h1>
+    }
+    else
+    {
+        <h1>Новостей пока еще нет.</h1>
+    }
 }
 
 <script>
@@ -107,6 +171,7 @@ else
         text.innerHTML = myString.slice(0, 750).html();
     })
 </script>
+
 @if ((await AuthorizationService.AuthorizeAsync(User, null, NewsOperations.Delete)).Succeeded)
 {
     <script>

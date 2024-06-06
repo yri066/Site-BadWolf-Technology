@@ -3,16 +3,21 @@ using BadWolfTechnology.Authorization.Comment;
 using BadWolfTechnology.Data;
 using BadWolfTechnology.Data.Interfaces;
 using BadWolfTechnology.Models;
+using HtmlAgilityPack;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
 using System.ComponentModel.DataAnnotations;
+using System.Text;
 using System.Text.RegularExpressions;
 
 namespace BadWolfTechnology.Controllers
 {
+    /// <summary>
+    /// Новости с комментариями.
+    /// </summary>
     [Authorize]
     public class NewsController : Controller
     {
@@ -31,14 +36,28 @@ namespace BadWolfTechnology.Controllers
             _authorizationService = authorization;
         }
 
+        public static readonly List<(string Value, string Label)> SortItems = new List<(string Name, string Label)>()
+        {
+            ("", "Сначала новые" ),
+            ("date_desc", "Сначала старые"),
+            ("alphabet", "По алфавиту (А - Я)"),
+            ("alphabet_desc", "По алфавиту (Я - А)")
+        };
+
         public NewsEdit Input { get; set; }
 
-
-        // GET: NewsController
         [AllowAnonymous]
         [Route("News")]
-        public async Task<ActionResult> IndexAsync(int Page = 1)
+        public async Task<ActionResult> IndexAsync(string sortOrder, [DataType(DataType.Date)] DateTime? startDate, [DataType(DataType.Date)] DateTime? endDate, [StringLength(maximumLength: 100, MinimumLength = 1)] string searchString, int Page = 1)
         {
+            Console.WriteLine(startDate);
+            Console.WriteLine(endDate);
+            ViewBag.SearchString = searchString;
+            sortOrder = string.IsNullOrEmpty(sortOrder) ? "" : sortOrder;
+            ViewBag.CurrentSort = sortOrder;
+            ViewBag.startDate = startDate;
+            ViewBag.endDate = endDate;
+
             int defaultPageSize = 4;
 
             if (Page < 1)
@@ -55,12 +74,40 @@ namespace BadWolfTechnology.Controllers
                 CommentCount = news.Comments.Where(comment => !comment.IsDeleted).Count(),
                 IsView = news.IsView,
                 IsDelete = news.IsDelete,
-                Created = news.Created
+                Created = news.Created,
+                SearchString = news.SearchString
             })
                 .Where(news => news.IsView)
-                .Where(news => !news.IsDelete)
-                .OrderByDescending(news => news.Created)
-                .AsNoTracking();
+                .Where(news => !news.IsDelete);
+
+            if (!string.IsNullOrEmpty(searchString))
+            {
+                source = source.Where(news => news.SearchString.Contains(searchString));
+            }
+
+            switch (sortOrder)
+            {
+                case "date_desc":
+                    source = source.OrderBy(news => news.Created);
+                    break;
+                case "alphabet":
+                    source = source.OrderBy(news => news.Title);
+                    break;
+                case "alphabet_desc":
+                    source = source.OrderByDescending(news => news.Title);
+                    break;
+                default:
+                    source = source.OrderByDescending(news => news.Created);
+                    break;
+            }
+
+            if(startDate is not null && endDate is not null)
+            {
+                endDate = endDate?.AddDays(1);
+                source = source.Where(news => news.Created >= startDate && news.Created < endDate);
+            }
+
+            source = source.AsNoTracking();
 
             var pagination = await PaginatedList<IPublication>.CreateAsync(source, Page, defaultPageSize);
 
@@ -72,7 +119,11 @@ namespace BadWolfTechnology.Controllers
             return View(pagination);
         }
 
-        // GET: NewsController/Details/5
+        /// <summary>
+        /// Страница просмотра новости.
+        /// </summary>
+        /// <param name="id">Ид новости.</param>
+        /// <returns>Страница просмотра новости.</returns>
         [Route("News/{id:guid}")]
         [AllowAnonymous]
         public async Task<ActionResult> Details(Guid id)
@@ -136,7 +187,7 @@ namespace BadWolfTechnology.Controllers
         [Authorize(Roles = "Administrator, NewsManager")]
         public async Task<ActionResult> EditAsync(Guid id, [Bind] NewsEdit Input, IFormFile? image)
         {
-            if(id == default)
+            if (id == default)
             {
                 return BadRequest();
             }
@@ -153,14 +204,14 @@ namespace BadWolfTechnology.Controllers
         {
             var news = await _context.News.Where(news => !news.IsDelete).Include(news => news.Comments).FirstOrDefaultAsync(news => news.Id == id);
 
-            if(news == null)
+            if (news == null)
             {
                 return NotFound();
             }
 
             news.IsDelete = true;
 
-            foreach(var comment in news.Comments)
+            foreach (var comment in news.Comments)
             {
                 comment.IsDeleted = true;
             }
@@ -173,16 +224,16 @@ namespace BadWolfTechnology.Controllers
         [HttpPost]
         [ValidateAntiForgeryToken]
         [Route("News/{id:guid}/CreateComment")]
-        public async Task<ActionResult> CreateComment(Guid id, [Bind("Text")] [StringLength(maximumLength:500, MinimumLength = 2)]string Text, long? ReplyId)
+        public async Task<ActionResult> CreateComment(Guid id, [Bind("Text")][StringLength(maximumLength: 500, MinimumLength = 2)] string Text, long? ReplyId)
         {
-            if(!ModelState.IsValid)
+            if (!ModelState.IsValid)
             {
                 return BadRequest();
             }
 
             var source = _context.News.Where(news => news.Id == id && !news.IsDelete);
 
-            if(ReplyId != null)
+            if (ReplyId != null)
             {
                 source = source.Include(news => news.Comments.Where(comment => comment.Id == ReplyId));
             }
@@ -221,15 +272,15 @@ namespace BadWolfTechnology.Controllers
         public async Task<ActionResult> DeleteComment(Guid id, long commentId)
         {
             var comment = await _context.Comments.Include(comment => comment.News).Where(comment => comment.News.Id == id).Include(comment => comment.User).FirstOrDefaultAsync(comment => comment.Id == commentId);
-            
-            if(comment == null)
+
+            if (comment == null)
             {
                 return NotFound();
             }
 
             var isAuthorized = await _authorizationService.AuthorizeAsync(User, comment, CommentOperations.Delete);
 
-            if(!isAuthorized.Succeeded)
+            if (!isAuthorized.Succeeded)
             {
                 return Forbid();
             }
@@ -237,7 +288,7 @@ namespace BadWolfTechnology.Controllers
             comment.IsDeleted = true;
             await _context.SaveChangesAsync();
 
-            return RedirectToAction(nameof(Details), new {id});
+            return RedirectToAction(nameof(Details), new { id });
         }
 
         /// <summary>
@@ -282,6 +333,9 @@ namespace BadWolfTechnology.Controllers
             }
 
             News? news;
+            var html = new HtmlDocument();
+            html.LoadHtml(Input.Text);
+            var searchText = $"{Input.Title} {RemoveHtml(html.DocumentNode)}";
 
             if (id == default)
             {
@@ -291,7 +345,8 @@ namespace BadWolfTechnology.Controllers
                     ImageName = Input.ImageName,
                     Text = Input.Text,
                     IsView = Input.IsView,
-                    Created = _dateTime.UtcNow
+                    Created = _dateTime.UtcNow,
+                    SearchString = searchText
                 };
 
                 await _context.AddAsync(news);
@@ -311,10 +366,32 @@ namespace BadWolfTechnology.Controllers
                 news.ImageName = Input.ImageName;
                 news.IsView = Input.IsView;
 
+                if (!news.SearchString.Equals(searchText))
+                {
+                    news.SearchString = searchText;
+                }
+
                 await _context.SaveChangesAsync();
             }
 
             return RedirectToAction(nameof(Details), new { news.Id });
+        }
+
+        private string RemoveHtml(HtmlNode node)
+        {
+            var sb = new StringBuilder();
+
+            foreach (HtmlNode child in node.ChildNodes)
+            {
+                string text = child.InnerText;
+
+                if (!string.IsNullOrEmpty(text))
+                {
+                    sb.AppendLine(text.Trim());
+                }
+            }
+
+            return sb.ToString();
         }
     }
 }

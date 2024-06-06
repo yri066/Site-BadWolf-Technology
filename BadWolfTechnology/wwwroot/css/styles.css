@@ -809,9 +809,14 @@ button[disabled] {
 
 .text-input.edit {
     width: -webkit-fill-available;
+    font-family: Verdana, Arial, Sans-Serif;
 }
 
 input[type="checkbox"] {
+    accent-color: #f58614;
+}
+
+input[type="radio"] {
     accent-color: #f58614;
 }
 
@@ -1152,4 +1157,150 @@ input[type='password'] {
         bottom: 0;
         opacity: 0;
     }
+}
+
+
+.search-box, .close-icon, .search-wrapper {
+    position: relative;
+    padding: 10px;
+}
+
+.close-icon {
+    position: absolute;
+    border: 1px solid transparent;
+    background-color: transparent;
+    display: inline-block;
+    vertical-align: middle;
+    outline: 0;
+    cursor: pointer;
+    margin: 4px 7px;
+}
+
+    .close-icon:after {
+        content: "✖";
+        display: block;
+        width: 15px;
+        height: 15px;
+        position: absolute;
+        background-color: #f58614;
+        z-index: 1;
+        right: 35px;
+        top: 0;
+        bottom: 0;
+        margin: auto;
+        padding: 2px;
+        border-radius: 50%;
+        text-align: center;
+        color: black;
+        font-weight: normal;
+        font-size: 10px;
+        box-shadow: 0 0 2px #E50F0F;
+        cursor: pointer;
+    }
+
+.text-input.edit:not(:valid) ~ .close-icon {
+    display: none;
+}
+
+.filters {
+    display: flex;
+    align-items: center;
+}
+
+.filter-date {
+    margin: 0 0 0 20px;
+}
+
+/*---daterangepicker---*/
+.daterangepicker-custom-css {
+    background-color: #212021 !important;
+}
+
+.daterangepicker .calendar-table {
+    background-color: #2F2D2F !important;
+}
+
+.daterangepicker .ranges li:hover {
+    background-color: #2F2D2F !important;
+}
+
+.daterangepicker .ranges li.active {
+    background-color: #ffc500 !important;
+    color: black !important;
+}
+
+.daterangepicker td.active, .daterangepicker td.active:hover {
+    background-color: #ffc500 !important;
+    color: black !important;
+}
+
+.daterangepicker td.off, .daterangepicker td.off.in-range, .daterangepicker td.off.start-date, .daterangepicker td.off.end-date {
+    color: black !important;
+}
+
+.daterangepicker td.in-range {
+    background-color: #ccc !important;
+}
+
+.daterangepicker td.available:hover {
+    background-color: #ffc500 !important;
+    color: black !important;
+}
+/*---popover---*/
+.sort-popover {
+    background: none !important;
+    border: none;
+    padding: 0 !important;
+    /*optional*/
+    font-family: arial, sans-serif;
+    /*input has OS specific font-family*/
+    position: relative;
+    color: #bbb;
+    text-decoration: none;
+    cursor: pointer;
+    user-select: none;
+}
+
+.sort-popover:hover {
+    text-decoration: none;
+}
+
+.sort-popover-content {
+    padding: 1px 5px 5px 5px;
+}
+.sort-popover-content:hover {
+    background: #1b1b1b;
+    border-radius: 5px;
+}
+
+.sort-popover-text:hover {
+    text-decoration: none;
+    cursor: pointer;
+    user-select: none;
+}
+
+#sort-popover {
+    background: #333;
+    color: white;
+    font-weight: 400;
+    padding: 0.6rem;
+    max-width: 200px;
+    line-height: 1.4;
+    position: absolute;
+    margin: 0 0;
+    border-radius: 7px;
+    z-index: 1000;
+    display: none;
+    border: 2px solid #ccc;
+}
+#sort-popover::after {
+    content: "";
+    position: absolute;
+    top: -10px; /* Position the triangle above the popover */
+    left: 50%;
+    margin-left: -2px;
+    border-width: 0 5px 10px 5px;
+    border-style: solid;
+    border-color: transparent transparent #bbb transparent;
+    z-index: 1001;
 }

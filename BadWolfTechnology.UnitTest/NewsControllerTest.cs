@@ -44,7 +44,7 @@ namespace BadWolfTechnology.UnitTest
             controller.ModelState.AddModelError("Text", "Поле Текст обязательно.");
 
             //Act
-            var result = await controller.Create(news, null);
+            var result = await controller.CreateAsync(news, null);
 
             //Assert
             Assert.IsType<ViewResult>(result);
@@ -72,7 +72,7 @@ namespace BadWolfTechnology.UnitTest
             var controller = new NewsController(context, fakeUserManager.Object, fakeAuthService.Object, fakeDateTime.Object, fakeFileManager.Object);
 
             //Act
-            var result = await controller.Create(news, null);
+            var result = await controller.CreateAsync(news, null);
 
             //Assert
             var resultRedirect = Assert.IsType<RedirectToActionResult>(result);

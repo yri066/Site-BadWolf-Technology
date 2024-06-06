@@ -87,7 +87,8 @@ namespace BadWolfTechnology.UnitTest.Data
                 Id = new Guid("A0AA3082-2510-41B6-7267-08DC5A777836"),
                 Title = "News 1",
                 Text = "News 1",
-                Created = new DateTime(2024, 04, 11, 22, 33, 54, 277)
+                Created = new DateTime(2024, 04, 11, 22, 33, 54, 277),
+                SearchString = "News 1 News 1"
             };
             var news1_comments1 = new Comment()
             {
@@ -134,7 +135,8 @@ namespace BadWolfTechnology.UnitTest.Data
                 Id = new Guid("DC911216-A63A-4639-B96C-08DC5A7A21D0"),
                 Title = "News 2",
                 Text = "News 2",
-                Created = new DateTime(2024, 04, 14, 06, 53, 48, 723)
+                Created = new DateTime(2024, 04, 14, 06, 53, 48, 723),
+                SearchString = "News 2 News 2"
             };
 
             var news3 = new News()
@@ -142,7 +144,8 @@ namespace BadWolfTechnology.UnitTest.Data
                 Id = new Guid("CA090C8C-7ED4-4726-429D-08DC5C4FA310"),
                 Title = "News 3",
                 Text = "News 3",
-                Created = new DateTime(2024, 04, 22, 12, 51, 36, 064)
+                Created = new DateTime(2024, 04, 22, 12, 51, 36, 064),
+                SearchString = "News 3 News 3"
             };
 
             var news3_comments1 = new Comment()
