@@ -80,3 +80,8 @@
     color: black;
 }
 
+#qrCode {
+    width: fit-content;
+    border: solid white;
+}
+
