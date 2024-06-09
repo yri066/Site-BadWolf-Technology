@@ -172,8 +172,48 @@ namespace BadWolfTechnology.UnitTest.Data
             };
             news3.Comments = new List<Comment>() { news3_comments1, news3_comments2, news3_comments3 };
 
+            var product1 = new Product()
+            {
+                Id = new Guid("031D37CE-034D-4DAF-5FBF-08DC744C684D"),
+                Title = "product1",
+                Text = "product1",
+                CodePage = "product1",
+                IsView = true,
+                IsDelete = false,
+                Created = new DateTime(2024, 05, 08, 16, 1, 43, 824),
+            };
+
+            var product2 = new Product()
+            {
+                Id = new Guid("65BFA8CB-B5FC-4C22-94FE-08DC74E6A1EC"),
+                Title = "product2",
+                Text = "product2",
+                CodePage = "product2",
+                IsView = true,
+                IsDelete = false,
+                Created = new DateTime(2024, 05, 09, 11, 12, 36, 234),
+            };
+
+            var product3 = new Product()
+            {
+                Id = new Guid("F87AA5AE-0130-4A89-94FF-08DC74E6A1EC"),
+                Title = "product3",
+                Text = "product3",
+                CodePage = "product3",
+                IsView = true,
+                IsDelete = false,
+                Created = new DateTime(2024, 05, 12, 08, 21, 53, 987),
+            };
+
             context.AddRange(user1, user2, user3);
             context.AddRange(news1, news2, news3);
+            context.AddRange(product1, product2, product3);
+
+            context.Database.ExecuteSqlRaw(@"
+                CREATE OR ALTER VIEW View_PostCodePages AS
+                SELECT Id, CodePage
+                FROM Posts
+            ");
 
             context.SaveChanges();
         }
