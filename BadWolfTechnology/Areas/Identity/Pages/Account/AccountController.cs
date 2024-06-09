@@ -80,7 +80,7 @@ namespace BadWolfTechnology.Areas.Identity.Pages.Account
                 }
                 if (result.RequiresTwoFactor)
                 {
-                    return RedirectToPage("./LoginWith2fa", new { ReturnUrl = returnPathName, RememberMe = Input.RememberMe });
+                    return Json(new { url = "/Identity/Account/LoginWith2fa" });
                 }
                 if (result.IsLockedOut)
                 {
