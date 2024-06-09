@@ -6,7 +6,6 @@ using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
-using Microsoft.EntityFrameworkCore.Infrastructure;
 using System.Diagnostics;
 
 namespace BadWolfTechnology.Controllers
@@ -19,14 +18,21 @@ namespace BadWolfTechnology.Controllers
         private readonly IDateTime _dateTime;
         private readonly IFileManager _fileManager;
         private readonly ILogger<HomeController> _logger;
+        private readonly IServiceProvider _serviceProvider;
 
-        public HomeController(ApplicationDbContext context, ILogger<HomeController> logger, UserManager<ApplicationUser> userManager, IDateTime dateTime, IFileManager fileManager)
+        public HomeController(ApplicationDbContext context,
+                              ILogger<HomeController> logger,
+                              UserManager<ApplicationUser> userManager,
+                              IDateTime dateTime,
+                              IFileManager fileManager,
+                              IServiceProvider serviceProvider)
         {
             _context = context;
             _logger = logger;
             _userManager = userManager;
             _dateTime = dateTime;
             _fileManager = fileManager;
+            _serviceProvider = serviceProvider;
         }
 
         [Route("{CodePage?}")]
@@ -102,7 +108,7 @@ namespace BadWolfTechnology.Controllers
 
         private async Task<ActionResult> SavePostAsync(PostEdit InputModel, IFormFile? image, Guid id = new Guid())
         {
-            var logger = _context.GetService<ILogger<ProductsController>>();
+            var logger = _serviceProvider.GetService(typeof(ILogger<ProductsController>)) as ILogger<ProductsController>;
             var productController = new ProductsController(_context, _userManager, _dateTime, _fileManager, logger);
             await productController.SavePostImageInTempFolderAsync(InputModel, image);
 
