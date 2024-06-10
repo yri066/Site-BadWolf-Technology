@@ -15,10 +15,9 @@ namespace BadWolfTechnology.UnitTest
 {
     public class NewsControllerTest : IClassFixture<TestDatabaseFixture>
     {
-        private readonly UserManager<ApplicationUser> _userManager;
         public TestDatabaseFixture Fixture { get; }
 
-        public NewsControllerTest(TestDatabaseFixture fixture, ITestOutputHelper testOutputHelper)
+        public NewsControllerTest(TestDatabaseFixture fixture)
         {
             Fixture = fixture;
         }
@@ -285,10 +284,14 @@ namespace BadWolfTechnology.UnitTest
             var id = new Guid("A0AA3082-2510-41B6-7267-08DC5A777836"); ;
             var commentId = 3;
 
+            var fakeUserStore = new Mock<IUserStore<ApplicationUser>>();
+            var fakeUserManager = new Mock<UserManager<ApplicationUser>>(
+                fakeUserStore.Object, null, null, null, null, null, null, null, null);
+
             var fakeAuthService = new Mock<IAuthorizationService>();
             var fakeDateTime = new Mock<IDateTime>();
             var fakeFileManager = new Mock<IFileManager>();
-            var controller = new NewsController(context, _userManager, fakeAuthService.Object, fakeDateTime.Object, fakeFileManager.Object);
+            var controller = new NewsController(context, fakeUserManager.Object, fakeAuthService.Object, fakeDateTime.Object, fakeFileManager.Object);
 
             // Act
             var result = await controller.DeleteComment(id, commentId);
@@ -305,10 +308,14 @@ namespace BadWolfTechnology.UnitTest
             var id = new Guid("A0AA3082-2510-41B6-7267-08DC5A777836");
             var commentId = 12345;
 
+            var fakeUserStore = new Mock<IUserStore<ApplicationUser>>();
+            var fakeUserManager = new Mock<UserManager<ApplicationUser>>(
+                fakeUserStore.Object, null, null, null, null, null, null, null, null);
+
             var fakeAuthService = new Mock<IAuthorizationService>();
             var fakeDateTime = new Mock<IDateTime>();
             var fakeFileManager = new Mock<IFileManager>();
-            var controller = new NewsController(context, _userManager, fakeAuthService.Object, fakeDateTime.Object, fakeFileManager.Object);
+            var controller = new NewsController(context, fakeUserManager.Object, fakeAuthService.Object, fakeDateTime.Object, fakeFileManager.Object);
 
             // Act
             var result = await controller.DeleteComment(id, commentId);
@@ -325,13 +332,17 @@ namespace BadWolfTechnology.UnitTest
             var id = new Guid("A0AA3082-2510-41B6-7267-08DC5A777836");
             var commentId = 1;
 
+            var fakeUserStore = new Mock<IUserStore<ApplicationUser>>();
+            var fakeUserManager = new Mock<UserManager<ApplicationUser>>(
+                fakeUserStore.Object, null, null, null, null, null, null, null, null);
+
             var fakeAuthService = new Mock<IAuthorizationService>();
             fakeAuthService.Setup(service => service.AuthorizeAsync(It.IsAny<ClaimsPrincipal>(), It.IsAny<object>(), It.IsAny<IAuthorizationRequirement[]>()))
                 .ReturnsAsync(AuthorizationResult.Failed);
             var fakeDateTime = new Mock<IDateTime>();
             var fakeFileManager = new Mock<IFileManager>();
 
-            var controller = new NewsController(context, _userManager, fakeAuthService.Object, fakeDateTime.Object, fakeFileManager.Object);
+            var controller = new NewsController(context, fakeUserManager.Object, fakeAuthService.Object, fakeDateTime.Object, fakeFileManager.Object);
 
             // Act
             var result = await controller.DeleteComment(id, commentId);
@@ -348,13 +359,17 @@ namespace BadWolfTechnology.UnitTest
             var id = new Guid("A0AA3082-2510-41B6-7267-08DC5A777836");
             var commentId = 1;
 
+            var fakeUserStore = new Mock<IUserStore<ApplicationUser>>();
+            var fakeUserManager = new Mock<UserManager<ApplicationUser>>(
+                fakeUserStore.Object, null, null, null, null, null, null, null, null);
+
             var fakeAuthService = new Mock<IAuthorizationService>();
             fakeAuthService.Setup(service => service.AuthorizeAsync(It.IsAny<ClaimsPrincipal>(), It.IsAny<object>(), It.IsAny<IAuthorizationRequirement[]>()))
                 .ReturnsAsync(AuthorizationResult.Success);
             var fakeDateTime = new Mock<IDateTime>();
             var fakeFileManager = new Mock<IFileManager>();
 
-            var controller = new NewsController(context, _userManager, fakeAuthService.Object, fakeDateTime.Object, fakeFileManager.Object);
+            var controller = new NewsController(context, fakeUserManager.Object, fakeAuthService.Object, fakeDateTime.Object, fakeFileManager.Object);
 
             // Act
             var result = await controller.DeleteComment(id, commentId);
