@@ -24,20 +24,15 @@
             if (JSON.parse(json).url) {
                 document.getElementById("auth-error").style.display = "none";
                 window.location.replace(JSON.parse(json).url);
-                return "";
             }
 
-            if (json === undefined || json == "") {
-                return "";
+            if (json != undefined || json != "") {
+                console.log();
+                showToast(JSON.parse(json).error);
+                document.getElementById("auth-error").innerText = JSON.parse(json).error;
+                document.getElementById("auth-error").style.display = "block";
             }
-
-            showToast(JSON.parse(json).error);
-            document.getElementById("auth-error").innerText = JSON.parse(json).error;
-            document.getElementById("auth-error").style.display = "block";
         })
             .catch(error => {
-            showToast("Неверный логин или пароль.");
-            document.getElementById("auth-error").innerText = "Неверный логин или пароль.";
-            document.getElementById("auth-error").style.display = "block";
         });
 }
