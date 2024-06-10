@@ -115,7 +115,7 @@ namespace BadWolfTechnology.Data
                 LastName = "Admin",
                 BirthDate = new DateTime(1997, 3, 11),
                 UserName = "Admin",
-                NormalizedUserName = "Admin",
+                NormalizedUserName = "ADMIN",
                 Email = "admin@badwolf.tech",
                 NormalizedEmail = "ADMIN@BADWOLF.TECH",
                 EmailConfirmed = true,

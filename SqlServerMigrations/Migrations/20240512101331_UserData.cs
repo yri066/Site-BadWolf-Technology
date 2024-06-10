@@ -24,7 +24,7 @@ namespace SqlServerMigrations.Migrations
             migrationBuilder.InsertData(
                 table: "AspNetUsers",
                 columns: new[] { "Id", "AccessFailedCount", "BirthDate", "ConcurrencyStamp", "Email", "EmailConfirmed", "FirstName", "LastName", "LockoutEnabled", "LockoutEnd", "NormalizedEmail", "NormalizedUserName", "PasswordHash", "PhoneNumber", "PhoneNumberConfirmed", "SecurityStamp", "TwoFactorEnabled", "UserName" },
-                values: new object[] { "87f7d358-de81-415b-a498-b08e0cf90636", 0, new DateTime(1997, 3, 11, 0, 0, 0, 0, DateTimeKind.Unspecified), "e612a8c8-7555-47b5-be79-59a4665c0559", "admin@badwolf.tech", true, "Admin", "Admin", false, null, "ADMIN@BADWOLF.TECH", "Admin", "AQAAAAEAACcQAAAAEAXUc1eWMEZ7n2TsbY90ntrTdMSUyhHXMuBRMiNLbAZIV6BQStACnB8c6mMGFoVUhg==", null, false, "542e803a-4ba7-4d5e-a5cc-f0443dd02368", false, "Admin" });
+                values: new object[] { "87f7d358-de81-415b-a498-b08e0cf90636", 0, new DateTime(1997, 3, 11, 0, 0, 0, 0, DateTimeKind.Unspecified), "e612a8c8-7555-47b5-be79-59a4665c0559", "admin@badwolf.tech", true, "Admin", "Admin", false, null, "ADMIN@BADWOLF.TECH", "ADMIN", "AQAAAAEAACcQAAAAEAXUc1eWMEZ7n2TsbY90ntrTdMSUyhHXMuBRMiNLbAZIV6BQStACnB8c6mMGFoVUhg==", null, false, "542e803a-4ba7-4d5e-a5cc-f0443dd02368", false, "Admin" });
 
             migrationBuilder.InsertData(
                 table: "Posts",
