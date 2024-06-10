@@ -42,6 +42,13 @@ namespace BadWolfTechnology.Controllers
             return await FindPageAsync(CodePage);
         }
 
+        [Route("StatusCode/{CodeError:int}")]
+        [AllowAnonymous]
+        public new ActionResult StatusCode(int CodeError)
+        {
+            return View(CodeError);
+        }
+
         [Authorize(Roles = "Administrator")]
         public async Task<ActionResult> Edit(Guid id)
         {
