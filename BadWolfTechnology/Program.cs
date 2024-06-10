@@ -10,6 +10,7 @@ using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Identity.UI.Services;
 using Microsoft.EntityFrameworkCore;
+using System.Configuration;
 
 namespace BadWolfTechnology
 {
@@ -23,10 +24,25 @@ namespace BadWolfTechnology
             var emailConfig = builder.Configuration.GetSection(EmailConfiguration.Position).Get<EmailConfiguration>();
 
             // Add services to the container.
-            var connectionString = builder.Configuration.GetConnectionString("DefaultConnection") ?? throw new InvalidOperationException("Connection string 'DefaultConnection' not found.");
-            builder.Services.AddDbContext<ApplicationDbContext>(options =>
-                options.UseSqlServer(connectionString));
-            builder.Services.AddDatabaseDeveloperPageExceptionFilter();
+            var provider = builder.Configuration.GetValue("Provider", "SqlServer");
+
+            builder.Services.AddDbContext<ApplicationDbContext>(
+                options => _ = provider switch
+                {
+                    "SqlServer" => _ = options.UseSqlServer(
+                        builder.Configuration.GetConnectionString("SqlServerConnection"),
+                        x => x.MigrationsAssembly("SqlServerMigrations")),
+
+                    "PostgreSQL" => _ = options.UseNpgsql(
+                        builder.Configuration.GetConnectionString("PostgreSQLConnection"),
+                        x => x.MigrationsAssembly("PostgreSQLMigrations")),
+
+                    _ => throw new Exception($"Unsupported provider: {provider}")
+                });
+
+            AppContext.SetSwitch("Npgsql.EnableLegacyTimestampBehavior", true);
+
+            builder.Services.AddDatabaseDeveloperPageExceptionFilter();// Убрать при публикации.
 
             builder.Services.AddDefaultIdentity<ApplicationUser>(options =>
             {
@@ -75,6 +91,12 @@ namespace BadWolfTechnology
             builder.Services.AddScoped<IAuthorizationHandler, AdminSuperAdministratorAuthorizationHandler>();
 
             var app = builder.Build();
+
+            using (var scope = app.Services.CreateScope())
+            {
+                var db = scope.ServiceProvider.GetRequiredService<ApplicationDbContext>();
+                db.Database.Migrate();
+            }
 
             // Configure the HTTP request pipeline.
             if (app.Environment.IsDevelopment())
