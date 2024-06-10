@@ -3,7 +3,7 @@ using Microsoft.EntityFrameworkCore.Migrations;
 
 #nullable disable
 
-namespace BadWolfTechnology.Data.Migrations
+namespace SqlServerMigrations.Migrations
 {
     public partial class InitSchema : Migration
     {

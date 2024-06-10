@@ -9,11 +9,11 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 #nullable disable
 
-namespace BadWolfTechnology.Data.Migrations
+namespace SqlServerMigrations.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
-    [Migration("20240512101331_UserData")]
-    partial class UserData
+    [Migration("20240606115904_CheckCodePage")]
+    partial class CheckCodePage
     {
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
@@ -105,7 +105,7 @@ namespace BadWolfTechnology.Data.Migrations
                             Id = "87f7d358-de81-415b-a498-b08e0cf90636",
                             AccessFailedCount = 0,
                             BirthDate = new DateTime(1997, 3, 11, 0, 0, 0, 0, DateTimeKind.Unspecified),
-                            ConcurrencyStamp = "e612a8c8-7555-47b5-be79-59a4665c0559",
+                            ConcurrencyStamp = "30a68933-2a12-4d35-9add-0e839b3f123d",
                             Email = "admin@badwolf.tech",
                             EmailConfirmed = true,
                             FirstName = "Admin",
@@ -113,9 +113,9 @@ namespace BadWolfTechnology.Data.Migrations
                             LockoutEnabled = false,
                             NormalizedEmail = "ADMIN@BADWOLF.TECH",
                             NormalizedUserName = "Admin",
-                            PasswordHash = "AQAAAAEAACcQAAAAEAXUc1eWMEZ7n2TsbY90ntrTdMSUyhHXMuBRMiNLbAZIV6BQStACnB8c6mMGFoVUhg==",
+                            PasswordHash = "AQAAAAEAACcQAAAAELvkdUB6U1cUB0BGWOlH7ymEh7kxe1XceCcZRYLIsS2iP0hPSGhRTYDsMxN7nY9FZA==",
                             PhoneNumberConfirmed = false,
-                            SecurityStamp = "542e803a-4ba7-4d5e-a5cc-f0443dd02368",
+                            SecurityStamp = "c04cad1b-b118-44eb-b63e-40eab3ff8bb3",
                             TwoFactorEnabled = false,
                             UserName = "Admin"
                         });
@@ -177,6 +177,10 @@ namespace BadWolfTechnology.Data.Migrations
                     b.Property<bool>("IsView")
                         .HasColumnType("bit");
 
+                    b.Property<string>("SearchString")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
                     b.Property<string>("Text")
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
@@ -215,9 +219,6 @@ namespace BadWolfTechnology.Data.Migrations
                     b.Property<string>("ImageName")
                         .HasColumnType("nvarchar(max)");
 
-                    b.Property<bool>("IsDelete")
-                        .HasColumnType("bit");
-
                     b.Property<bool>("IsView")
                         .HasColumnType("bit");
 
@@ -232,6 +233,8 @@ namespace BadWolfTechnology.Data.Migrations
 
                     b.HasKey("Id");
 
+                    b.HasIndex("CodePage");
+
                     b.ToTable("Posts");
 
                     b.HasDiscriminator<string>("Discriminator").HasValue("Post");
@@ -243,7 +246,6 @@ namespace BadWolfTechnology.Data.Migrations
                             CodePage = "Index",
                             Contents = "[]",
                             Created = new DateTime(2024, 5, 8, 0, 0, 0, 0, DateTimeKind.Unspecified),
-                            IsDelete = false,
                             IsView = true,
                             Text = "Информация заполняется администратором.",
                             Title = "Главная"
@@ -254,7 +256,6 @@ namespace BadWolfTechnology.Data.Migrations
                             CodePage = "Privacy",
                             Contents = "[]",
                             Created = new DateTime(2024, 5, 8, 0, 0, 0, 0, DateTimeKind.Unspecified),
-                            IsDelete = false,
                             IsView = true,
                             Text = "Информация заполняется администратором.",
                             Title = "Конфиденциальность"
@@ -265,11 +266,25 @@ namespace BadWolfTechnology.Data.Migrations
                             CodePage = "Cookies",
                             Contents = "[]",
                             Created = new DateTime(2024, 5, 8, 0, 0, 0, 0, DateTimeKind.Unspecified),
-                            IsDelete = false,
                             IsView = true,
                             Text = "Информация заполняется администратором.",
                             Title = "Cookies"
                         });
+                });
+
+            modelBuilder.Entity("BadWolfTechnology.Data.PostCodePages", b =>
+                {
+                    b.Property<Guid>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<string>("CodePage")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.HasKey("Id");
+
+                    b.ToView("View_PostCodePages");
                 });
 
             modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityRole", b =>
@@ -302,35 +317,35 @@ namespace BadWolfTechnology.Data.Migrations
                         new
                         {
                             Id = "32098694-1c75-46d3-87a8-da162dab0335",
-                            ConcurrencyStamp = "48f2fe6c-f12c-4788-ab94-d016b5b310dd",
+                            ConcurrencyStamp = "84f80948-1f5d-4d78-9f91-75c63d062933",
                             Name = "SuperAdministrator",
                             NormalizedName = "SUPERADMINISTRATOR"
                         },
                         new
                         {
                             Id = "874a001d-3ef4-49af-a579-844c9a1034b4",
-                            ConcurrencyStamp = "2856cf5b-9af9-40ba-bcd3-013e810e92c7",
+                            ConcurrencyStamp = "d91aca47-9eec-4834-822d-9b0b2f495431",
                             Name = "Administrator",
                             NormalizedName = "ADMINISTRATOR"
                         },
                         new
                         {
                             Id = "114fcebd-a934-479c-aa42-48d5d84e0670",
-                            ConcurrencyStamp = "ff5a822b-505d-4a45-8790-906dd5d363d7",
+                            ConcurrencyStamp = "aa5cfcc8-ed88-461a-b6fc-38bcb9d436ba",
                             Name = "NewsManager",
                             NormalizedName = "NEWSMANAGER"
                         },
                         new
                         {
                             Id = "4e9c0350-32c1-464f-b41a-2d0b595a0a8c",
-                            ConcurrencyStamp = "e28a5cc4-fcdf-4836-9b63-dae26ad56597",
+                            ConcurrencyStamp = "513babcf-04e7-4a2a-b639-2a9f7e97a9f6",
                             Name = "CommentManager",
                             NormalizedName = "COMMENTMANAGER"
                         },
                         new
                         {
                             Id = "c91f0ea1-9279-46fb-bb9e-f70b0879a0c7",
-                            ConcurrencyStamp = "1bc8e192-3565-4813-aa17-9d66657bff54",
+                            ConcurrencyStamp = "e75f9d09-da8d-4063-aa2f-dd377fd6ff19",
                             Name = "ProductManager",
                             NormalizedName = "PRODUCTMANAGER"
                         });
@@ -461,6 +476,9 @@ namespace BadWolfTechnology.Data.Migrations
             modelBuilder.Entity("BadWolfTechnology.Data.Product", b =>
                 {
                     b.HasBaseType("BadWolfTechnology.Data.Post");
+
+                    b.Property<bool>("IsDelete")
+                        .HasColumnType("bit");
 
                     b.HasDiscriminator().HasValue("Product");
                 });

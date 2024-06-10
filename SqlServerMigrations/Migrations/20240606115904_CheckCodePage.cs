@@ -3,60 +3,62 @@ using Microsoft.EntityFrameworkCore.Migrations;
 
 #nullable disable
 
-namespace BadWolfTechnology.Data.Migrations
+namespace SqlServerMigrations.Migrations
 {
-    public partial class NewsSearchString : Migration
+    public partial class CheckCodePage : Migration
     {
         protected override void Up(MigrationBuilder migrationBuilder)
         {
-            migrationBuilder.AddColumn<string>(
-                name: "SearchString",
-                table: "News",
-                type: "nvarchar(max)",
-                nullable: false,
-                defaultValue: "");
+            migrationBuilder.Sql(@"
+                CREATE VIEW View_PostCodePages AS
+                SELECT Id, CodePage
+                FROM Posts
+            ");
+
+            migrationBuilder.DropTable(
+                name: "Post");
 
             migrationBuilder.UpdateData(
                 table: "AspNetRoles",
                 keyColumn: "Id",
                 keyValue: "114fcebd-a934-479c-aa42-48d5d84e0670",
                 column: "ConcurrencyStamp",
-                value: "cab4ea0c-db49-400f-8571-5a4daea7a8c3");
+                value: "aa5cfcc8-ed88-461a-b6fc-38bcb9d436ba");
 
             migrationBuilder.UpdateData(
                 table: "AspNetRoles",
                 keyColumn: "Id",
                 keyValue: "32098694-1c75-46d3-87a8-da162dab0335",
                 column: "ConcurrencyStamp",
-                value: "cd2656b2-78ed-4ee4-9e77-a935de2b1a2b");
+                value: "84f80948-1f5d-4d78-9f91-75c63d062933");
 
             migrationBuilder.UpdateData(
                 table: "AspNetRoles",
                 keyColumn: "Id",
                 keyValue: "4e9c0350-32c1-464f-b41a-2d0b595a0a8c",
                 column: "ConcurrencyStamp",
-                value: "83a78850-2042-4722-b12b-785b9e548216");
+                value: "513babcf-04e7-4a2a-b639-2a9f7e97a9f6");
 
             migrationBuilder.UpdateData(
                 table: "AspNetRoles",
                 keyColumn: "Id",
                 keyValue: "874a001d-3ef4-49af-a579-844c9a1034b4",
                 column: "ConcurrencyStamp",
-                value: "b1f35085-4cfe-46a6-82bc-9d19ebeba4be");
+                value: "d91aca47-9eec-4834-822d-9b0b2f495431");
 
             migrationBuilder.UpdateData(
                 table: "AspNetRoles",
                 keyColumn: "Id",
                 keyValue: "c91f0ea1-9279-46fb-bb9e-f70b0879a0c7",
                 column: "ConcurrencyStamp",
-                value: "ac8df4f1-8c4c-4f7e-b29e-9835bef1bb61");
+                value: "e75f9d09-da8d-4063-aa2f-dd377fd6ff19");
 
             migrationBuilder.UpdateData(
                 table: "AspNetUsers",
                 keyColumn: "Id",
                 keyValue: "87f7d358-de81-415b-a498-b08e0cf90636",
                 columns: new[] { "ConcurrencyStamp", "PasswordHash", "SecurityStamp" },
-                values: new object[] { "6428faa2-7646-4a94-8f88-20dfa09d2a50", "AQAAAAEAACcQAAAAEH5yWk5/c8YDmzZXZxZV5oS3K1mUUSIpHnElvjo6RbW1wABKjLDtIDoN2WW1tEB3pQ==", "b82a1215-02d2-42da-8b96-8df7b943bcee" });
+                values: new object[] { "30a68933-2a12-4d35-9add-0e839b3f123d", "AQAAAAEAACcQAAAAELvkdUB6U1cUB0BGWOlH7ymEh7kxe1XceCcZRYLIsS2iP0hPSGhRTYDsMxN7nY9FZA==", "c04cad1b-b118-44eb-b63e-40eab3ff8bb3" });
 
             migrationBuilder.UpdateData(
                 table: "Posts",
@@ -82,51 +84,61 @@ namespace BadWolfTechnology.Data.Migrations
 
         protected override void Down(MigrationBuilder migrationBuilder)
         {
-            migrationBuilder.DropColumn(
-                name: "SearchString",
-                table: "News");
+            migrationBuilder.Sql(@"
+                drop view View_PostCodePages;
+            ");
+            migrationBuilder.CreateTable(
+                name: "Post",
+                columns: table => new
+                {
+                    CodePage = table.Column<string>(type: "nvarchar(max)", nullable: false),
+                    Id = table.Column<Guid>(type: "uniqueidentifier", nullable: false)
+                },
+                constraints: table =>
+                {
+                });
 
             migrationBuilder.UpdateData(
                 table: "AspNetRoles",
                 keyColumn: "Id",
                 keyValue: "114fcebd-a934-479c-aa42-48d5d84e0670",
                 column: "ConcurrencyStamp",
-                value: "4d0674fb-0630-4e8a-8322-4684cd70c1f3");
+                value: "075e6439-3fbe-4306-a60a-ee366bead180");
 
             migrationBuilder.UpdateData(
                 table: "AspNetRoles",
                 keyColumn: "Id",
                 keyValue: "32098694-1c75-46d3-87a8-da162dab0335",
                 column: "ConcurrencyStamp",
-                value: "49a60f82-ddb8-4455-8693-579d134dd960");
+                value: "2b7441fd-c13a-442d-83c8-fb5705bc59f8");
 
             migrationBuilder.UpdateData(
                 table: "AspNetRoles",
                 keyColumn: "Id",
                 keyValue: "4e9c0350-32c1-464f-b41a-2d0b595a0a8c",
                 column: "ConcurrencyStamp",
-                value: "92459e34-f3f2-4ce4-accc-b202cefa68d0");
+                value: "e3990cab-6aa9-4a02-99a1-4d3013102dfa");
 
             migrationBuilder.UpdateData(
                 table: "AspNetRoles",
                 keyColumn: "Id",
                 keyValue: "874a001d-3ef4-49af-a579-844c9a1034b4",
                 column: "ConcurrencyStamp",
-                value: "e6741cf4-295c-4285-8290-c0b373e6ce21");
+                value: "49ef2a27-c427-430b-a9f3-e62ff68a6fec");
 
             migrationBuilder.UpdateData(
                 table: "AspNetRoles",
                 keyColumn: "Id",
                 keyValue: "c91f0ea1-9279-46fb-bb9e-f70b0879a0c7",
                 column: "ConcurrencyStamp",
-                value: "3ab42317-9642-4ef3-a0a8-4a29b4d53905");
+                value: "93aa62f5-1e01-49b1-8bad-692312c2d765");
 
             migrationBuilder.UpdateData(
                 table: "AspNetUsers",
                 keyColumn: "Id",
                 keyValue: "87f7d358-de81-415b-a498-b08e0cf90636",
                 columns: new[] { "ConcurrencyStamp", "PasswordHash", "SecurityStamp" },
-                values: new object[] { "e7524319-1117-4b4f-b2e8-9d0032b56ef1", "AQAAAAEAACcQAAAAEIsTKtfi5dGcjOpHMlWqeoZTPvaTFj531yUPlvojD44lLOSQ1qG/p0vOz5Cq+GaqDQ==", "78a47df8-1052-405e-949f-e25eb04760e5" });
+                values: new object[] { "9b98702b-6051-467b-9465-80a3241c2ae6", "AQAAAAEAACcQAAAAEF49OC7RFp4c+AwIYnPHEdKQzt1m9WyiGDTWh+X604azXdxDQbsrxi+otFvBjFWmYQ==", "55747b94-ce03-4f5e-8608-0ffc6d519fdd" });
         }
     }
 }

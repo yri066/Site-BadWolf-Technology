@@ -4,18 +4,16 @@ using BadWolfTechnology.Data;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
-using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 #nullable disable
 
-namespace BadWolfTechnology.Data.Migrations
+namespace SqlServerMigrations.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
-    [Migration("20240511194559_Posts")]
-    partial class Posts
+    partial class ApplicationDbContextModelSnapshot : ModelSnapshot
     {
-        protected override void BuildTargetModel(ModelBuilder modelBuilder)
+        protected override void BuildModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -98,6 +96,27 @@ namespace BadWolfTechnology.Data.Migrations
                         .HasFilter("[NormalizedUserName] IS NOT NULL");
 
                     b.ToTable("AspNetUsers", (string)null);
+
+                    b.HasData(
+                        new
+                        {
+                            Id = "87f7d358-de81-415b-a498-b08e0cf90636",
+                            AccessFailedCount = 0,
+                            BirthDate = new DateTime(1997, 3, 11, 0, 0, 0, 0, DateTimeKind.Unspecified),
+                            ConcurrencyStamp = "30a68933-2a12-4d35-9add-0e839b3f123d",
+                            Email = "admin@badwolf.tech",
+                            EmailConfirmed = true,
+                            FirstName = "Admin",
+                            LastName = "Admin",
+                            LockoutEnabled = false,
+                            NormalizedEmail = "ADMIN@BADWOLF.TECH",
+                            NormalizedUserName = "Admin",
+                            PasswordHash = "AQAAAAEAACcQAAAAELvkdUB6U1cUB0BGWOlH7ymEh7kxe1XceCcZRYLIsS2iP0hPSGhRTYDsMxN7nY9FZA==",
+                            PhoneNumberConfirmed = false,
+                            SecurityStamp = "c04cad1b-b118-44eb-b63e-40eab3ff8bb3",
+                            TwoFactorEnabled = false,
+                            UserName = "Admin"
+                        });
                 });
 
             modelBuilder.Entity("BadWolfTechnology.Data.Comment", b =>
@@ -156,6 +175,10 @@ namespace BadWolfTechnology.Data.Migrations
                     b.Property<bool>("IsView")
                         .HasColumnType("bit");
 
+                    b.Property<string>("SearchString")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
                     b.Property<string>("Text")
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
@@ -194,9 +217,6 @@ namespace BadWolfTechnology.Data.Migrations
                     b.Property<string>("ImageName")
                         .HasColumnType("nvarchar(max)");
 
-                    b.Property<bool>("IsDelete")
-                        .HasColumnType("bit");
-
                     b.Property<bool>("IsView")
                         .HasColumnType("bit");
 
@@ -211,9 +231,58 @@ namespace BadWolfTechnology.Data.Migrations
 
                     b.HasKey("Id");
 
+                    b.HasIndex("CodePage");
+
                     b.ToTable("Posts");
 
                     b.HasDiscriminator<string>("Discriminator").HasValue("Post");
+
+                    b.HasData(
+                        new
+                        {
+                            Id = new Guid("b43d176a-6cda-46ac-aaa4-7b8720d0393d"),
+                            CodePage = "Index",
+                            Contents = "[]",
+                            Created = new DateTime(2024, 5, 8, 0, 0, 0, 0, DateTimeKind.Unspecified),
+                            IsView = true,
+                            Text = "Информация заполняется администратором.",
+                            Title = "Главная"
+                        },
+                        new
+                        {
+                            Id = new Guid("7bda8276-759d-4bbb-b795-104b2d2c5235"),
+                            CodePage = "Privacy",
+                            Contents = "[]",
+                            Created = new DateTime(2024, 5, 8, 0, 0, 0, 0, DateTimeKind.Unspecified),
+                            IsView = true,
+                            Text = "Информация заполняется администратором.",
+                            Title = "Конфиденциальность"
+                        },
+                        new
+                        {
+                            Id = new Guid("88494cd9-a407-4ce6-aff4-8e5e25a1df5a"),
+                            CodePage = "Cookies",
+                            Contents = "[]",
+                            Created = new DateTime(2024, 5, 8, 0, 0, 0, 0, DateTimeKind.Unspecified),
+                            IsView = true,
+                            Text = "Информация заполняется администратором.",
+                            Title = "Cookies"
+                        });
+                });
+
+            modelBuilder.Entity("BadWolfTechnology.Data.PostCodePages", b =>
+                {
+                    b.Property<Guid>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<string>("CodePage")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.HasKey("Id");
+
+                    b.ToView("View_PostCodePages");
                 });
 
             modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityRole", b =>
@@ -241,6 +310,43 @@ namespace BadWolfTechnology.Data.Migrations
                         .HasFilter("[NormalizedName] IS NOT NULL");
 
                     b.ToTable("AspNetRoles", (string)null);
+
+                    b.HasData(
+                        new
+                        {
+                            Id = "32098694-1c75-46d3-87a8-da162dab0335",
+                            ConcurrencyStamp = "84f80948-1f5d-4d78-9f91-75c63d062933",
+                            Name = "SuperAdministrator",
+                            NormalizedName = "SUPERADMINISTRATOR"
+                        },
+                        new
+                        {
+                            Id = "874a001d-3ef4-49af-a579-844c9a1034b4",
+                            ConcurrencyStamp = "d91aca47-9eec-4834-822d-9b0b2f495431",
+                            Name = "Administrator",
+                            NormalizedName = "ADMINISTRATOR"
+                        },
+                        new
+                        {
+                            Id = "114fcebd-a934-479c-aa42-48d5d84e0670",
+                            ConcurrencyStamp = "aa5cfcc8-ed88-461a-b6fc-38bcb9d436ba",
+                            Name = "NewsManager",
+                            NormalizedName = "NEWSMANAGER"
+                        },
+                        new
+                        {
+                            Id = "4e9c0350-32c1-464f-b41a-2d0b595a0a8c",
+                            ConcurrencyStamp = "513babcf-04e7-4a2a-b639-2a9f7e97a9f6",
+                            Name = "CommentManager",
+                            NormalizedName = "COMMENTMANAGER"
+                        },
+                        new
+                        {
+                            Id = "c91f0ea1-9279-46fb-bb9e-f70b0879a0c7",
+                            ConcurrencyStamp = "e75f9d09-da8d-4063-aa2f-dd377fd6ff19",
+                            Name = "ProductManager",
+                            NormalizedName = "PRODUCTMANAGER"
+                        });
                 });
 
             modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityRoleClaim<string>", b =>
@@ -330,6 +436,18 @@ namespace BadWolfTechnology.Data.Migrations
                     b.HasIndex("RoleId");
 
                     b.ToTable("AspNetUserRoles", (string)null);
+
+                    b.HasData(
+                        new
+                        {
+                            UserId = "87f7d358-de81-415b-a498-b08e0cf90636",
+                            RoleId = "32098694-1c75-46d3-87a8-da162dab0335"
+                        },
+                        new
+                        {
+                            UserId = "87f7d358-de81-415b-a498-b08e0cf90636",
+                            RoleId = "874a001d-3ef4-49af-a579-844c9a1034b4"
+                        });
                 });
 
             modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityUserToken<string>", b =>
@@ -356,6 +474,9 @@ namespace BadWolfTechnology.Data.Migrations
             modelBuilder.Entity("BadWolfTechnology.Data.Product", b =>
                 {
                     b.HasBaseType("BadWolfTechnology.Data.Post");
+
+                    b.Property<bool>("IsDelete")
+                        .HasColumnType("bit");
 
                     b.HasDiscriminator().HasValue("Product");
                 });
