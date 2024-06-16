@@ -1225,8 +1225,8 @@ input[type='password'] {
 }
 
 .daterangepicker .ranges li.active {
-    background-color: #ffc500 !important;
-    color: black !important;
+    background-color: #212021 !important;
+    color: #ccc !important;
 }
 
 .daterangepicker td.active, .daterangepicker td.active:hover {

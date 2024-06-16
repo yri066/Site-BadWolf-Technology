@@ -78,8 +78,8 @@ $(function () {
 
         if (picker.startDate.format('DD-MM-YYYY') == picker.endDate.format('DD-MM-YYYY') && picker.startDate.format('DD-MM-YYYY') != '01-01-1970') {
             $(this).text(picker.startDate.format('DD-MM-YYYY'))
-            document.getElementById('startDate').value = picker.startDate.format('MM-DD-YYYY');
-            document.getElementById('endDate').value = picker.endDate.format('MM-DD-YYYY');
+            document.getElementById('startDate').value = picker.startDate.format('YYYY-MM-DD');
+            document.getElementById('endDate').value = picker.endDate.format('YYYY-MM-DD');
         }
         else if (picker.startDate.format('DD-MM-YYYY') == '01-01-1970') {
             $(this).text("За все время");
@@ -90,8 +90,8 @@ $(function () {
         }
         else {
             $(this).text(picker.startDate.format('DD-MM-YYYY') + ' - ' + picker.endDate.format('DD-MM-YYYY'))
-            document.getElementById('startDate').value = picker.startDate.format('MM-DD-YYYY');
-            document.getElementById('endDate').value = picker.endDate.format('MM-DD-YYYY');
+            document.getElementById('startDate').value = picker.startDate.format('YYYY-MM-DD');
+            document.getElementById('endDate').value = picker.endDate.format('YYYY-MM-DD');
         }
 
         updateTempInputsForm();
