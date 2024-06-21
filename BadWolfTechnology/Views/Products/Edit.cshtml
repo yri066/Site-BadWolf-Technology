@@ -56,7 +56,7 @@
                         value="@Model.ImageName" />
                     <input type="text" asp-for="TempImageName" id="ModelTempImageName" class="text-input"
                         style="display:none;" value="@Model.TempImageName" />
-                    <input type="file" name="image" id="ModelFile" accept=".jpg, .jpeg, .png .webp"
+                    <input type="file" name="image" id="ModelFile" accept=".jpg, .jpeg, .png, .webp,"
                         placeholder="Загрузите изображение" onchange="updatePreview(this, 'image-preview')" />
                     <br>
                     <span asp-validation-for="ImageName" class="text-danger"></span>
