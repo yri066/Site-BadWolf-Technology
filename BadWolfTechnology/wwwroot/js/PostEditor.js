@@ -498,6 +498,6 @@ function moveItem(itemList, element, direction) {
     if (newIndex >= 0 && newIndex < itemList.children.length) {
         // Меняет элементы местами
         const referenceNode = itemList.children[newIndex];
-        itemList.insertBefore(element, direction === 1 ? referenceNode.nextSibling : referenceNode);
+        itemList.insertBefore(element, direction === 1 ? referenceNode : referenceNode.nextSibling);
     }
 }
