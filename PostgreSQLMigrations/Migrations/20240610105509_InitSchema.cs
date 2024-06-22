@@ -91,9 +91,9 @@ namespace PostgreSQLMigrations.Migrations
                 });
 
                 migrationBuilder.Sql(@"
-                    CREATE VIEW View_PostCodePages AS
+                    CREATE OR REPLACE VIEW public.""View_PostCodePages"" AS
                     SELECT ""Posts"".""Id"", ""Posts"".""CodePage""
-                    FROM ""public"".""Posts"";
+                    FROM ""Posts"";
                 ");
 
             migrationBuilder.CreateTable(

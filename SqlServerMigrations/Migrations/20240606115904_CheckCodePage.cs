@@ -10,7 +10,7 @@ namespace SqlServerMigrations.Migrations
         protected override void Up(MigrationBuilder migrationBuilder)
         {
             migrationBuilder.Sql(@"
-                CREATE VIEW View_PostCodePages AS
+                CREATE OR ALTER VIEW View_PostCodePages AS
                 SELECT Id, CodePage
                 FROM Posts
             ");
