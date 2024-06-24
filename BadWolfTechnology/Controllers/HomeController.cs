@@ -1,4 +1,6 @@
 ﻿using BadWolfTechnology.Areas.Identity.Data;
+using BadWolfTechnology.Authorization.Post;
+using BadWolfTechnology.Authorization.Product;
 using BadWolfTechnology.Data;
 using BadWolfTechnology.Data.Interfaces;
 using BadWolfTechnology.Models;
@@ -19,13 +21,15 @@ namespace BadWolfTechnology.Controllers
         private readonly IFileManager _fileManager;
         private readonly ILogger<HomeController> _logger;
         private readonly IServiceProvider _serviceProvider;
+        private readonly IAuthorizationService _authorizationService;
 
         public HomeController(ApplicationDbContext context,
                               ILogger<HomeController> logger,
                               UserManager<ApplicationUser> userManager,
                               IDateTime dateTime,
                               IFileManager fileManager,
-                              IServiceProvider serviceProvider)
+                              IServiceProvider serviceProvider,
+                              IAuthorizationService authorization)
         {
             _context = context;
             _logger = logger;
@@ -33,6 +37,7 @@ namespace BadWolfTechnology.Controllers
             _dateTime = dateTime;
             _fileManager = fileManager;
             _serviceProvider = serviceProvider;
+            _authorizationService = authorization;
         }
 
         [Route("{CodePage?}")]
@@ -94,11 +99,18 @@ namespace BadWolfTechnology.Controllers
 
         private async Task<ActionResult> FindPageAsync(string CodePage, string view = "Index")
         {
-            var post = await _context.Posts
-                .Where(p => EF.Property<string>(p, "Discriminator") == nameof(Post))
-                .FirstOrDefaultAsync(x => x.CodePage == CodePage);
+            var source = _context.Posts.Where(p => EF.Property<string>(p, "Discriminator") == nameof(Post));
+            
+            var isAuthorized = await _authorizationService.AuthorizeAsync(User, new Post(), PostOperations.ViewHidden);
 
-            if (post is null || !post.IsView)
+            if (!isAuthorized.Succeeded)
+            {
+                source = source.Where(product => product.IsView);
+            }
+
+            var post = await source.FirstOrDefaultAsync(x => x.CodePage == CodePage);
+
+            if (post is null)
             {
                 return NotFound();
             }
@@ -116,7 +128,8 @@ namespace BadWolfTechnology.Controllers
         private async Task<ActionResult> SavePostAsync(PostEdit InputModel, IFormFile? image, Guid id = new Guid())
         {
             var logger = _serviceProvider.GetService(typeof(ILogger<ProductsController>)) as ILogger<ProductsController>;
-            var productController = new ProductsController(_context, _userManager, _dateTime, _fileManager, logger);
+            var authorizationService = _serviceProvider.GetService(typeof(IAuthorizationService)) as IAuthorizationService;
+            var productController = new ProductsController(_context, _userManager, _dateTime, _fileManager, logger, authorizationService);
             await productController.SavePostImageInTempFolderAsync(InputModel, image);
 
             if (!ModelState.IsValid)

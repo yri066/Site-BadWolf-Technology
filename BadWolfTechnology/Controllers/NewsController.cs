@@ -1,5 +1,6 @@
 ﻿using BadWolfTechnology.Areas.Identity.Data;
 using BadWolfTechnology.Authorization.Comment;
+using BadWolfTechnology.Authorization.News;
 using BadWolfTechnology.Data;
 using BadWolfTechnology.Data.Interfaces;
 using BadWolfTechnology.Models;
@@ -76,9 +77,16 @@ namespace BadWolfTechnology.Controllers
                 IsDelete = news.IsDelete,
                 Created = news.Created,
                 SearchString = news.SearchString
-            })
-                .Where(news => news.IsView)
-                .Where(news => !news.IsDelete);
+            });
+
+            var isAuthorized = await _authorizationService.AuthorizeAsync(User, new News(), NewsOperations.ViewHidden);
+
+            if (!isAuthorized.Succeeded)
+            {
+                source = source.Where(news => news.IsView);
+            }
+
+            source = source.Where(news => !news.IsDelete);
 
             if (!string.IsNullOrEmpty(searchString))
             {
@@ -128,7 +136,16 @@ namespace BadWolfTechnology.Controllers
         [AllowAnonymous]
         public async Task<ActionResult> Details(Guid id)
         {
-            var news = await _context.News.Include(n => n.Comments).ThenInclude(comment => comment.User).FirstOrDefaultAsync(x => x.Id == id);
+            var source = _context.News;
+
+            var isAuthorized = await _authorizationService.AuthorizeAsync(User, new News(), NewsOperations.ViewHidden);
+
+            if (!isAuthorized.Succeeded)
+            {
+                source = (DbSet<News>)source.Where(news => news.IsView);
+            }
+
+            var news = await source.Include(n => n.Comments).ThenInclude(comment => comment.User).FirstOrDefaultAsync(x => x.Id == id);
 
             if (news is null || news.IsDelete)
             {

@@ -6,6 +6,7 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
+using BadWolfTechnology.Authorization.Product;
 
 namespace BadWolfTechnology.Controllers
 {
@@ -17,13 +18,16 @@ namespace BadWolfTechnology.Controllers
         private readonly IDateTime _dateTime;
         private readonly IFileManager _fileManager;
         private readonly ILogger<ProductsController> _logger;
-        public ProductsController(ApplicationDbContext context, UserManager<ApplicationUser> userManager, IDateTime dateTime, IFileManager fileManager, ILogger<ProductsController> logger)
+        private readonly IAuthorizationService _authorizationService;
+
+        public ProductsController(ApplicationDbContext context, UserManager<ApplicationUser> userManager, IDateTime dateTime, IFileManager fileManager, ILogger<ProductsController> logger, IAuthorizationService authorization)
         {
             _context = context;
             _userManager = userManager;
             _dateTime = dateTime;
             _fileManager = fileManager;
             _logger = logger;
+            _authorizationService = authorization;
         }
 
         [BindProperty]
@@ -40,20 +44,27 @@ namespace BadWolfTechnology.Controllers
                 Page = 1;
             }
 
-            var source = _context.Products.Select(news => new Product
+            var source = _context.Products.Select(product => new Product
             {
-                Id = news.Id,
-                Title = news.Title,
-                ImageName = news.ImageName,
-                Text = news.Text,
-                IsView = news.IsView,
-                IsDelete = news.IsDelete,
-                Created = news.Created,
-                CodePage = news.CodePage,
-            })
-                .Where(news => news.IsView)
-                .Where(news => !news.IsDelete)
-                .OrderByDescending(news => news.Created)
+                Id = product.Id,
+                Title = product.Title,
+                ImageName = product.ImageName,
+                Text = product.Text,
+                IsView = product.IsView,
+                IsDelete = product.IsDelete,
+                Created = product.Created,
+                CodePage = product.CodePage,
+            });
+
+            var isAuthorized = await _authorizationService.AuthorizeAsync(User, new Product(), ProductOperations.ViewHidden);
+
+            if (!isAuthorized.Succeeded)
+            {
+                source = source.Where(product => product.IsView);
+            }
+
+            source = source.Where(product => !product.IsDelete)
+                .OrderByDescending(product => product.Created)
                 .AsNoTracking();
 
             var pagination = await PaginatedList<IPublication>.CreateAsync(source, Page, defaultPageSize);
@@ -68,11 +79,20 @@ namespace BadWolfTechnology.Controllers
 
         [Route("Products/{CodePage}")]
         [AllowAnonymous]
-        public ActionResult Details(string CodePage)
+        public async Task<ActionResult> Details(string CodePage)
         {
-            var product = _context.Products.Where(prod => !prod.IsDelete).AsNoTracking().FirstOrDefault(prod => prod.CodePage == CodePage);
+            var source = _context.Products;
 
-            if(product is null)
+            var isAuthorized = await _authorizationService.AuthorizeAsync(User, new Product(), ProductOperations.ViewHidden);
+
+            if (!isAuthorized.Succeeded)
+            {
+                source = (DbSet<Product>)source.Where(product => product.IsView);
+            }
+
+            var product = await source.Where(prod => !prod.IsDelete).AsNoTracking().FirstOrDefaultAsync(prod => prod.CodePage == CodePage);
+
+            if (product is null)
             {
                 return NotFound();
             }
