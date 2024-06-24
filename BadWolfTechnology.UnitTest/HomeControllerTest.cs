@@ -42,12 +42,14 @@ namespace BadWolfTechnology.UnitTest
             var fakeUserManager = new Mock<UserManager<ApplicationUser>>(fakeUserStore.Object, null, null, null, null, null, null, null, null);
             var fakeDateTime = new Mock<IDateTime>();
             var fakeFileManager = new Mock<IFileManager>();
+            var fakeAuthService = new Mock<IAuthorizationService>();
 
             var controller = new HomeController(context, fakeLogger.Object,
                                                          fakeUserManager.Object,
                                                          fakeDateTime.Object,
                                                          fakeFileManager.Object,
-                                                         fakeServiceProvider.Object);
+                                                         fakeServiceProvider.Object,
+                                                         fakeAuthService.Object);
 
             //Act
             var result = await controller.EditAsync(postId, post, null);
@@ -81,12 +83,14 @@ namespace BadWolfTechnology.UnitTest
             var fakeUserManager = new Mock<UserManager<ApplicationUser>>(fakeUserStore.Object, null, null, null, null, null, null, null, null);
             var fakeDateTime = new Mock<IDateTime>();
             var fakeFileManager = new Mock<IFileManager>();
+            var fakeAuthService = new Mock<IAuthorizationService>();
 
             var controller = new HomeController(context, fakeLogger.Object,
                                                          fakeUserManager.Object,
                                                          fakeDateTime.Object,
                                                          fakeFileManager.Object,
-                                                         fakeServiceProvider.Object);
+                                                         fakeServiceProvider.Object,
+                                                         fakeAuthService.Object);
             controller.ModelState.AddModelError("Text", "Поле Текст обязательно.");
 
             //Act
@@ -120,12 +124,14 @@ namespace BadWolfTechnology.UnitTest
             var fakeUserManager = new Mock<UserManager<ApplicationUser>>(fakeUserStore.Object, null, null, null, null, null, null, null, null);
             var fakeDateTime = new Mock<IDateTime>();
             var fakeFileManager = new Mock<IFileManager>();
+            var fakeAuthService = new Mock<IAuthorizationService>();
 
             var controller = new HomeController(context, fakeLogger.Object,
                                                          fakeUserManager.Object,
                                                          fakeDateTime.Object,
                                                          fakeFileManager.Object,
-                                                         fakeServiceProvider.Object);
+                                                         fakeServiceProvider.Object,
+                                                         fakeAuthService.Object);
 
             //Act
             var result = await controller.EditAsync(postId, post, null);

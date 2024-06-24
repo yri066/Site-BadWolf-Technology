@@ -4,6 +4,7 @@ using BadWolfTechnology.Data;
 using BadWolfTechnology.Data.Interfaces;
 using BadWolfTechnology.Models;
 using BadWolfTechnology.UnitTest.Data;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
@@ -24,14 +25,13 @@ namespace BadWolfTechnology.UnitTest
         {
             //Arrange
             using var context = Fixture.CreateContext();
-            var productId = new Guid("031D37CE-034D-4DAF-5FBF-08DC744C684D");
             var todayDate = new DateTime(2024, 05, 08);
             var actionName = "Details";
             var product = new PostEdit()
             {
-                Title = "DynamicCoverVK",
+                Title = "DynamicCoverVK-2",
                 Text = "Динамическая обложка для сообществ и профилей ВКонтакте.",
-                CodePage = "DynamicCoverVK",
+                CodePage = "DynamicCoverVK-2",
                 IsView = true,
             };
 
@@ -42,11 +42,13 @@ namespace BadWolfTechnology.UnitTest
             var fakeDateTime = new Mock<IDateTime>();
                 fakeDateTime.Setup(x => x.UtcNow).Returns(todayDate);
             var fakeFileManager = new Mock<IFileManager>();
+            var fakeAuthService = new Mock<IAuthorizationService>();
 
             var controller = new ProductsController(context, fakeUserManager.Object,
                                                              fakeDateTime.Object,
                                                              fakeFileManager.Object,
-                                                             fakeLogger.Object);
+                                                             fakeLogger.Object,
+                                                             fakeAuthService.Object);
             controller.InputModel = product;
 
             //Act
@@ -61,7 +63,7 @@ namespace BadWolfTechnology.UnitTest
         }
 
         [Fact]
-        public async void CreatePost_ModelStateIsInvalid_ReturnView()
+        public async void CreateProduct_ModelStateIsInvalid_ReturnView()
         {
             //Arrange
             using var context = Fixture.CreateContext();
@@ -79,11 +81,13 @@ namespace BadWolfTechnology.UnitTest
             var fakeDateTime = new Mock<IDateTime>();
                 fakeDateTime.Setup(x => x.UtcNow).Returns(todayDate);
             var fakeFileManager = new Mock<IFileManager>();
+            var fakeAuthService = new Mock<IAuthorizationService>();
 
             var controller = new ProductsController(context, fakeUserManager.Object,
                                                              fakeDateTime.Object,
                                                              fakeFileManager.Object,
-                                                             fakeLogger.Object);
+                                                             fakeLogger.Object,
+                                                             fakeAuthService.Object);
             controller.InputModel = product;
             controller.ModelState.AddModelError("Text", "Поле Текст обязательно.");
 
@@ -118,11 +122,13 @@ namespace BadWolfTechnology.UnitTest
             var fakeUserManager = new Mock<UserManager<ApplicationUser>>(fakeUserStore.Object, null, null, null, null, null, null, null, null);
             var fakeDateTime = new Mock<IDateTime>();
             var fakeFileManager = new Mock<IFileManager>();
+            var fakeAuthService = new Mock<IAuthorizationService>();
 
             var controller = new ProductsController(context, fakeUserManager.Object,
                                                              fakeDateTime.Object,
                                                              fakeFileManager.Object,
-                                                             fakeLogger.Object);
+                                                             fakeLogger.Object,
+                                                             fakeAuthService.Object);
             controller.InputModel = product;
 
             //Act
@@ -154,11 +160,13 @@ namespace BadWolfTechnology.UnitTest
             var fakeUserManager = new Mock<UserManager<ApplicationUser>>(fakeUserStore.Object, null, null, null, null, null, null, null, null);
             var fakeDateTime = new Mock<IDateTime>();
             var fakeFileManager = new Mock<IFileManager>();
+            var fakeAuthService = new Mock<IAuthorizationService>();
 
             var controller = new ProductsController(context, fakeUserManager.Object,
                                                              fakeDateTime.Object,
                                                              fakeFileManager.Object,
-                                                             fakeLogger.Object);
+                                                             fakeLogger.Object,
+                                                             fakeAuthService.Object);
             controller.InputModel = product;
             controller.ModelState.AddModelError("Text", "Поле Текст обязательно.");
 
@@ -191,11 +199,13 @@ namespace BadWolfTechnology.UnitTest
             var fakeUserManager = new Mock<UserManager<ApplicationUser>>(fakeUserStore.Object, null, null, null, null, null, null, null, null);
             var fakeDateTime = new Mock<IDateTime>();
             var fakeFileManager = new Mock<IFileManager>();
+            var fakeAuthService = new Mock<IAuthorizationService>();
 
             var controller = new ProductsController(context, fakeUserManager.Object,
                                                              fakeDateTime.Object,
                                                              fakeFileManager.Object,
-                                                             fakeLogger.Object);
+                                                             fakeLogger.Object,
+                                                             fakeAuthService.Object);
             controller.InputModel = product;
 
             //Act
@@ -217,11 +227,13 @@ namespace BadWolfTechnology.UnitTest
             var fakeUserManager = new Mock<UserManager<ApplicationUser>>(fakeUserStore.Object, null, null, null, null, null, null, null, null);
             var fakeDateTime = new Mock<IDateTime>();
             var fakeFileManager = new Mock<IFileManager>();
+            var fakeAuthService = new Mock<IAuthorizationService>();
 
             var controller = new ProductsController(context, fakeUserManager.Object,
                                                              fakeDateTime.Object,
                                                              fakeFileManager.Object,
-                                                             fakeLogger.Object);
+                                                             fakeLogger.Object,
+                                                             fakeAuthService.Object);
 
             //Act
 
@@ -236,7 +248,7 @@ namespace BadWolfTechnology.UnitTest
         {
             //Arrange
             var context = Fixture.CreateContext();
-            var productId = new Guid("031D37CE-034D-4DAF-5FBF-08DC744C684D");
+            var productId = new Guid("F87AA5AE-0130-4A89-94FF-08DC74E6A1EC");
             var actionName = "Index";
 
             var fakeLogger = new Mock<ILogger<ProductsController>>();
@@ -244,11 +256,13 @@ namespace BadWolfTechnology.UnitTest
             var fakeUserManager = new Mock<UserManager<ApplicationUser>>(fakeUserStore.Object, null, null, null, null, null, null, null, null);
             var fakeDateTime = new Mock<IDateTime>();
             var fakeFileManager = new Mock<IFileManager>();
+            var fakeAuthService = new Mock<IAuthorizationService>();
 
             var controller = new ProductsController(context, fakeUserManager.Object,
                                                              fakeDateTime.Object,
                                                              fakeFileManager.Object,
-                                                             fakeLogger.Object);
+                                                             fakeLogger.Object,
+                                                             fakeAuthService.Object);
 
             //Act
 
