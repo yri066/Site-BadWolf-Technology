@@ -136,18 +136,18 @@ namespace BadWolfTechnology.Controllers
         [AllowAnonymous]
         public async Task<ActionResult> Details(Guid id)
         {
-            var source = _context.News;
+            var source = _context.News.Where(news => !news.IsDelete);
 
             var isAuthorized = await _authorizationService.AuthorizeAsync(User, new News(), NewsOperations.ViewHidden);
 
             if (!isAuthorized.Succeeded)
             {
-                source = (DbSet<News>)source.Where(news => news.IsView);
+                source = source.Where(news => news.IsView);
             }
 
             var news = await source.Include(n => n.Comments).ThenInclude(comment => comment.User).FirstOrDefaultAsync(x => x.Id == id);
 
-            if (news is null || news.IsDelete)
+            if (news is null)
             {
                 return NotFound();
             }

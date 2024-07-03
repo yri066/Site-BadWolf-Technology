@@ -81,16 +81,16 @@ namespace BadWolfTechnology.Controllers
         [AllowAnonymous]
         public async Task<ActionResult> Details(string CodePage)
         {
-            var source = _context.Products;
+            var source = _context.Products.Where(prod => !prod.IsDelete);
 
             var isAuthorized = await _authorizationService.AuthorizeAsync(User, new Product(), ProductOperations.ViewHidden);
 
             if (!isAuthorized.Succeeded)
             {
-                source = (DbSet<Product>)source.Where(product => product.IsView);
+                source = source.Where(product => product.IsView);
             }
 
-            var product = await source.Where(prod => !prod.IsDelete).AsNoTracking().FirstOrDefaultAsync(prod => prod.CodePage == CodePage);
+            var product = await source.AsNoTracking().FirstOrDefaultAsync(prod => prod.CodePage == CodePage);
 
             if (product is null)
             {
