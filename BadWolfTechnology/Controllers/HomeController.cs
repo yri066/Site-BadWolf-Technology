@@ -128,8 +128,7 @@ namespace BadWolfTechnology.Controllers
         private async Task<ActionResult> SavePostAsync(PostEdit InputModel, IFormFile? image, Guid id = new Guid())
         {
             var logger = _serviceProvider.GetService(typeof(ILogger<ProductsController>)) as ILogger<ProductsController>;
-            var authorizationService = _serviceProvider.GetService(typeof(IAuthorizationService)) as IAuthorizationService;
-            var productController = new ProductsController(_context, _userManager, _dateTime, _fileManager, logger, authorizationService);
+            var productController = new ProductsController(_context, _userManager, _dateTime, _fileManager, logger, _authorizationService);
             await productController.SavePostImageInTempFolderAsync(InputModel, image);
 
             if (!ModelState.IsValid)
