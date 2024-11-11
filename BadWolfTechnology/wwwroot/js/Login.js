@@ -19,6 +19,7 @@
 
             if (result.error) {
                 // Если авторизация не удалась, вывести сообщение об ошибке.
+
                 showError(result.error);
             }
         } else if (response.ok) {
